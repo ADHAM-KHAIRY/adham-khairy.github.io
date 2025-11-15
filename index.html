@@ -3,28 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penetration Tester Portfolio</title>
+    <title>0xSponge - Penetration Tester Portfolio</title>
             <style>
-        /* 3. Neon Cyberpunk */
-        /* :root {
-            --bg-primary: #13111c;
-            --bg-secondary: rgba(19, 17, 28, 0.8);
-            --text-primary: #ff2a6d;
-            --text-secondary: #d1d7e0;
-            --accent: #6bd1ff;
-            --border: #3f1d38;
-            --header: #261c2c;
-        } */
-        /* 6. Stealth Mode - Subtle dark with purple accents */
-        /* :root {
-            --bg-primary: #121212;
-            --bg-secondary: rgba(18, 18, 18, 0.8);
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent: #bb86fc;
-            --border: #333333;
-            --header: #1e1e1e;
-        } */
         /* 9. Ghost Shell - Ethereal gray/blue theme */
         :root {
             --bg-primary: #13151a;
@@ -175,24 +155,26 @@
             <span class="cursor"></span>
         </div>
         
-        <p class="subtitle">Junior Penetration Tester | CS Student</p>
+        <p class="subtitle">Bug Bounty Hunter | Penetration Tester | CS Student</p>
         
         <div class="nav-links">
             <a href="about.html" class="nav-link">About</a>
-            <a href="#projects" class="nav-link">Projects</a>
-            <a href="#skills" class="nav-link">Skills</a>
-            <a href="#contact" class="nav-link">Contact</a>
+            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="contact.html" class="nav-link">Contact</a>
         </div>
         
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
                 <i>LinkedIn</i>
             </a>
             <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
-                <i>Tryhackme</i>
+                <i>TryHackMe</i>
             </a>
             <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
                 <i>GitHub</i>
+            </a>
+            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+                <i>HackerOne</i>
             </a>
         </div>
         
@@ -204,36 +186,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const textElement = document.querySelector('.typing-text');
-            const messages = ['Hello World.', 'Hello Friend...'];
+            const messages = ['Hello World.', 'Hello Friend...', '0xSponge'];
             let messageIndex = 0;
             let charIndex = 0;
             let isDeleting = false;
-            let typingSpeed = 100; // Faster typing speed
-            let deletingSpeed = 90; // Faster deleting speed
-            let pauseBeforeDelete = 700; // Shorter pause
-            let pauseBeforeType = 300; // Shorter pause
+            let typingSpeed = 100;
+            let deletingSpeed = 90;
+            let pauseBeforeDelete = 700;
+            let pauseBeforeType = 300;
             
             function type() {
                 const currentMessage = messages[messageIndex];
                 
                 if (isDeleting) {
-                    // Deleting text
                     textElement.textContent = currentMessage.substring(0, charIndex - 1);
                     charIndex--;
                     typingSpeed = deletingSpeed;
                     
-                    // When fully deleted
                     if (charIndex === 0) {
                         isDeleting = false;
                         messageIndex = (messageIndex + 1) % messages.length;
                         typingSpeed = pauseBeforeType;
                     }
                 } else {
-                    // Typing text
                     textElement.textContent = currentMessage.substring(0, charIndex + 1);
                     charIndex++;
                     
-                    // When fully typed
                     if (charIndex === currentMessage.length) {
                         isDeleting = true;
                         typingSpeed = pauseBeforeDelete;
@@ -243,7 +221,6 @@
                 setTimeout(type, typingSpeed);
             }
             
-            // Start the typing effect
             setTimeout(type, pauseBeforeType);
         });
     </script>
