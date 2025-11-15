@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0xSponge - Penetration Tester Portfolio</title>
+    <title>0xSponge</title>
             <style>
         /* 9. Ghost Shell - Ethereal gray/blue theme */
         :root {
@@ -142,6 +142,77 @@
             border-radius: 6px;
             font-size: 0.9rem;
         }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+                width: 95%;
+            }
+            
+            .typing-text {
+                font-size: 2.5rem;
+                height: 4rem;
+            }
+            
+            .cursor {
+                height: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .nav-links {
+                gap: 12px;
+            }
+            
+            .nav-link {
+                font-size: 1rem;
+                padding: 6px 12px;
+            }
+            
+            .social-icons {
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+            
+            .social-icon {
+                font-size: 1.2rem;
+            }
+            
+            .terminal-header {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .typing-text {
+                font-size: 2rem;
+                height: 3.5rem;
+            }
+            
+            .cursor {
+                height: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 5px 10px;
+            }
+            
+            .terminal-header {
+                font-size: 0.7rem;
+            }
+            
+            .badge-container iframe {
+                width: 280px;
+                height: 75px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -159,21 +230,18 @@
         
         <div class="nav-links">
             <a href="about.html" class="nav-link">About</a>
-            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="blog.html" class="nav-link">Blog</a>
             <a href="contact.html" class="nav-link">Contact</a>
         </div>
         
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
                 <i>LinkedIn</i>
             </a>
-            <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
+            <a href="https://tryhackme.com/p/0xAdham" class="social-icon" target="_blank">
                 <i>TryHackMe</i>
             </a>
-            <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
-                <i>GitHub</i>
-            </a>
-            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+            <a href="https://hackerone.com/0xadham?type=user" class="social-icon" target="_blank">
                 <i>HackerOne</i>
             </a>
         </div>
@@ -186,7 +254,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const textElement = document.querySelector('.typing-text');
-            const messages = ['Hello Friend...', '0xSponge'];
+            const messages = ['Hello World.', 'Hello Friend...', '0xSponge'];
             let messageIndex = 0;
             let charIndex = 0;
             let isDeleting = false;
