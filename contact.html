@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0xSponge - Contact</title>
+    <title>0xSponge</title>
     <style>
         :root {
             --bg-primary: #13151a;
@@ -428,18 +428,86 @@
         }
         
         @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
             header {
-                flex-direction: column;
-                gap: 15px;
+                padding: 12px 15px;
             }
             
             .nav-links {
-                width: 100%;
-                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
             }
             
-            .form-grid {
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .terminal-header {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            
+            .console-content {
+                padding: 15px;
+            }
+            
+            .console-output {
+                font-size: 0.8rem;
+            }
+            
+            .contact-methods {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .contact-card {
+                padding: 15px;
+            }
+            
+            .contact-icon {
+                font-size: 1.8rem;
+            }
+            
+            .contact-title {
+                font-size: 1.1rem;
+            }
+            
+            .social-icons {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .footer {
+                padding: 15px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .terminal-header {
+                font-size: 0.7rem;
+                overflow-x: auto;
+            }
+            
+            .console-output {
+                font-size: 0.75rem;
+            }
+            
+            .contact-card {
+                padding: 12px;
             }
         }
     </style>
@@ -449,7 +517,7 @@
         <nav class="nav-links">
             <a href="index.html" class="nav-link">Home</a>
             <a href="about.html" class="nav-link">About</a>
-            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="blog.html" class="nav-link">Blog</a>
             <a href="contact.html" class="nav-link active">Contact</a>
         </nav>
     </header>
@@ -487,21 +555,10 @@
             </div>
             
             <div class="contact-card">
-                <div class="contact-icon">👨‍💻</div>
-                <h3 class="contact-title">GitHub</h3>
-                <p class="contact-value">
-                    <a href="https://github.com/ADHAM-KHAIRY" target="_blank">ADHAM-KHAIRY</a>
-                </p>
-                <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
-                    Check out my repositories and projects
-                </p>
-            </div>
-            
-            <div class="contact-card">
                 <div class="contact-icon">🔗</div>
                 <h3 class="contact-title">LinkedIn</h3>
                 <p class="contact-value">
-                    <a href="https://www.linkedin.com/in/adhamkhairy" target="_blank">adhamkhairy</a>
+                    <a href="https://www.linkedin.com/in/adham-khairy-985834323/" target="_blank">adham-khairy</a>
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     Connect with me professionally
@@ -512,7 +569,7 @@
                 <div class="contact-icon">🎯</div>
                 <h3 class="contact-title">TryHackMe</h3>
                 <p class="contact-value">
-                    <a href="https://tryhackme.com/p/justbeing.adham" target="_blank">justbeing.adham</a>
+                    <a href="https://tryhackme.com/p/0xAdham" target="_blank">0xAdham</a>
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     Follow my CTF journey
@@ -523,114 +580,24 @@
                 <div class="contact-icon">🐛</div>
                 <h3 class="contact-title">HackerOne</h3>
                 <p class="contact-value">
-                    <a href="https://hackerone.com/0xsponge" target="_blank">0xsponge</a>
+                    <a href="https://hackerone.com/0xadham?type=user" target="_blank">0xadham</a>
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     Bug bounty profile
                 </p>
-            </div>
-
-            <div class="contact-card">
-                <div class="contact-icon">📞</div>
-                <h3 class="contact-title">Phone</h3>
-                <p class="contact-value">
-                    <a href="tel:+201550273344">(+20) 155-027-3344</a>
-                </p>
-                <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
-                    Available for professional inquiries
-                </p>
-            </div>
-        </div>
-        
-        <div class="form-container">
-            <h3 class="form-title">$ Send_Message.sh</h3>
-            
-            <div id="statusMessage" class="status-message"></div>
-            
-            <form id="contactForm" onsubmit="return validateForm()">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="form-label">NAME:</label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="John Doe">
-                        <div id="nameError" class="form-error">Please enter your name</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email" class="form-label">EMAIL:</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="your@email.com">
-                        <div id="emailError" class="form-error">Please enter a valid email address</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="subject" class="form-label">SUBJECT:</label>
-                        <input type="text" id="subject" name="subject" class="form-input" placeholder="Let's collaborate on a security project">
-                        <div id="subjectError" class="form-error">Please enter a subject</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="message" class="form-label">MESSAGE:</label>
-                        <textarea id="message" name="message" class="form-textarea" placeholder="Type your message here..."></textarea>
-                        <div id="messageError" class="form-error">Please enter your message</div>
-                    </div>
-                    
-                    <div class="submit-container">
-                        <button type="submit" class="submit-btn">
-                            <span class="submit-icon">$</span> EXECUTE TRANSMISSION
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-        
-        <div class="encryption-section">
-            <h3 class="encryption-title">
-                <span class="encryption-icon">🔐</span> Secure Communications
-            </h3>
-            
-            <p class="encryption-info">
-                For secure and private communications, you can encrypt your messages using my PGP public key. This ensures that only I can read the content of your message.
-            </p>
-            
-            <div class="pgp-container">
-                <div class="pgp-header">
-                    <span>PGP Public Key</span>
-                    <button id="copyPgpBtn" class="copy-btn">
-                        <span class="copy-icon">📋</span> Copy Key
-                    </button>
-                </div>
-                <div class="pgp-content" id="pgpKey">
------BEGIN PGP PUBLIC KEY BLOCK-----
-mQENBGQxEF0BCADZP3ySYgSXSYbM21Q7ntKk4Rq9Qp6KvUUl0D+QVLY9xGYL
-YkpFjfPUFXoRu5Y8m/N66677XSiHnKd9JBv4HYkgS9hJBVqV1cWOeBvlF8k3
-jGLvM2U2Qb2JjgZnz1rxCiGqj5ZIhqX27XmxNR8hszk4HqOOXsLZJfBZrV32
-6Dh9jk7Y0pY6mZrn7sC4mO4XN5Mo96J3EHYaJkWiXdnrXCSgLP9x+XHdWDQm
-RVUBkGKvE0VIvlKr7Q0JQ6x+GW1NWJ5xPpw6+TUIF6euKLx2nNGsxqzGELcf
-W15FlOAsjm3uiCRB9xGoP1CUEZl4+5x2GlIAHEAKQEZMGb6ahRCf2icFDzaK
-wD28njLCGJxZAxSgAehiOQO6P5AQu1jw9mUQzIh54A2t5hN5BFRdCXUTr9TP
-pqFI6Y3eeEWJoihayU+YVICFNmHlr2vM0+BWAQDkjgjz2WO7hGIZl9GbfQSW
-M4kUX5CZHbUsF0X9sJWV0wARAQABtFNBZGhhbSBLaGFpcnkgKFByb2Zlc3Np
-b25hbCBrZXkgZm9yIHNlY3VyZSBjb21tdW5pY2F0aW9uKSA8YWRoYW0ua2hh
-aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
-... (truncated for brevity) ...
-=LvmD
------END PGP PUBLIC KEY BLOCK-----
-                </div>
             </div>
         </div>
     </div>
     
     <footer class="footer">
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
                 LinkedIn
             </a>
-            <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
+            <a href="https://tryhackme.com/p/0xAdham" class="social-icon" target="_blank">
                 TryHackMe
             </a>
-            <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
-                GitHub
-            </a>
-            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+            <a href="https://hackerone.com/0xadham?type=user" class="social-icon" target="_blank">
                 HackerOne
             </a>
         </div>
@@ -638,80 +605,6 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
     </footer>
 
     <script>
-        function validateForm() {
-            let isValid = true;
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const subject = document.getElementById('subject').value.trim();
-            const message = document.getElementById('message').value.trim();
-            
-            document.querySelectorAll('.form-error').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            if (name === '') {
-                document.getElementById('nameError').style.display = 'block';
-                isValid = false;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            }
-            
-            if (subject === '') {
-                document.getElementById('subjectError').style.display = 'block';
-                isValid = false;
-            }
-            
-            if (message === '') {
-                document.getElementById('messageError').style.display = 'block';
-                isValid = false;
-            }
-            
-            if (isValid) {
-                const statusMessage = document.getElementById('statusMessage');
-                statusMessage.className = 'status-message status-success';
-                statusMessage.innerHTML = `
-                    <strong>[+] Message transmission successful</strong><br>
-                    Thank you for reaching out. I'll respond to your message as soon as possible.
-                `;
-                statusMessage.style.display = 'block';
-                
-                document.getElementById('contactForm').reset();
-                statusMessage.scrollIntoView({ behavior: 'smooth' });
-                
-                setTimeout(() => {
-                    statusMessage.style.display = 'none';
-                }, 5000);
-            }
-            
-            return false;
-        }
-        
-        document.getElementById('copyPgpBtn').addEventListener('click', function() {
-            const pgpKey = document.getElementById('pgpKey').innerText;
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = pgpKey;
-            textarea.setAttribute('readonly', '');
-            textarea.style.position = 'absolute';
-            textarea.style.left = '-9999px';
-            document.body.appendChild(textarea);
-            
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            const originalText = this.innerHTML;
-            this.innerHTML = '<span class="copy-icon">✓</span> Copied!';
-            
-            setTimeout(() => {
-                this.innerHTML = originalText;
-            }, 2000);
-        });
-        
         document.addEventListener('DOMContentLoaded', function() {
             const consoleOutput = document.querySelector('.console-output');
             const originalText = consoleOutput.innerHTML;
