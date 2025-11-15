@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Penetration Tester Portfolio</title>
+    <title>0xSponge - About</title>
     <style>
         :root {
             --bg-primary: #13151a;
@@ -67,7 +67,7 @@
         
         .container {
             flex: 1;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -145,6 +145,61 @@
             margin-top: 5px;
             margin-right: 5px;
         }
+
+        .cert-badge.in-progress {
+            background-color: rgba(255, 200, 100, 0.1);
+            color: #ffc864;
+        }
+
+        .experience-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .experience-item:last-child {
+            border-bottom: none;
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .experience-title {
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .experience-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .experience-company {
+            color: var(--accent);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .experience-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .experience-description ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .experience-description li {
+            margin-bottom: 5px;
+        }
         
         .footer {
             text-align: center;
@@ -186,7 +241,6 @@
             border: none;
         }
         
-        /* Responsive design */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -196,6 +250,10 @@
             .nav-links {
                 width: 100%;
                 justify-content: space-around;
+            }
+
+            .experience-header {
+                flex-direction: column;
             }
         }
 
@@ -220,93 +278,144 @@
         
         <div class="bio-container">
             <div class="bio-section">
-                <h3>Background</h3>
-                <p>Hello, I'm <strong>Adham Khairy</strong>, a passionate Computer Science student at <strong>Helwan University</strong>
-                                    with a focus on cybersecurity and ethical hacking. My journey in the digital security realm began with curiosity about how systems work—and how to bypass the limits they impose.</p>
+                <h3>Professional Summary</h3>
+                <p>Hello, I'm <strong>Adham Khairy</strong> (0xSponge), a Bug Bounty Hunter and Penetration Tester with hands-on experience in web application, mobile application, network, and Active Directory exploitation. With a strong background in scripting, reverse engineering, and OSINT, I have a proven ability to identify, exploit, and document security weaknesses while providing actionable remediation strategies.</p>
 
-                <p>Currently in my studies, I am developing a strong foundation in computer science fundamentals while actively pursuing specialized knowledge in penetration testing .</p>
+                <p>Currently pursuing my Bachelor's degree in Computer Science at <strong>Helwan University</strong>, I combine academic knowledge with practical offensive security skills to stay at the forefront of cybersecurity.</p>
+            </div>
+
+            <div class="bio-section">
+                <h3>Experience</h3>
+                
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="experience-title">Independent Security Researcher</div>
+                            <div class="experience-company">Remote</div>
+                        </div>
+                        <div class="experience-date">Aug. 2024 – Present</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Completed 530+ TryHackMe rooms and 175+ PortSwigger Web Security Academy labs, covering Web, Active Directory, and privilege escalation techniques</li>
+                            <li>Participated in 15+ online/offline CTF competitions, collaborating with teams to solve web, network, and Misc challenges under time pressure</li>
+                            <li>Active Bug Bounty Hunter on HackerOne, responsibly disclosing findings and earning bounties</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="experience-title">Offensive Security Bootcamp Trainee</div>
+                            <div class="experience-company">We Innovate (On-site)</div>
+                        </div>
+                        <div class="experience-date">Jun. 2025 – Aug. 2025</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Completed in-depth training in Web, Network, and Active Directory penetration testing, with an introduction to Android security</li>
+                            <li>Practiced exploitation techniques including SQLi, XSS, AD enumeration, Kerberoasting, and privilege escalation</li>
+                            <li>Concluded bootcamp with a full Active Directory engagement and presented findings to peers and instructors, improving technical presentation and teamwork skills</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="experience-title">Cybersecurity Intern</div>
+                            <div class="experience-company">Hack Secure (Remote)</div>
+                        </div>
+                        <div class="experience-date">Apr. 2025 – May 2025</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Learned penetration testing fundamentals including recon, enumeration, and exploiting common web vulnerabilities</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             
             <div class="bio-section">
                 <h3>Educational Journey</h3>
-                <p><strong>Bachelor of Computer Science</strong> - Helwan University</p>
-                <p>My academic path has equipped me with knowledge in:</p>
+                <p><strong>Bachelor of Computer Science</strong> - Helwan University (Oct. 2024 – Present)</p>
+                <p><strong>Expected Graduation:</strong> June 2028</p>
+                <p>Relevant coursework includes:</p>
                 <div class="skills-list">
+                    <span class="skill-badge">Computer Networks</span>
+                    <span class="skill-badge">Information Security</span>
+                    <span class="skill-badge">Operating Systems</span>
                     <span class="skill-badge">Algorithms</span>
                     <span class="skill-badge">Data Structures</span>
-                    <span class="skill-badge">Software Engineering</span>
-                    <span class="skill-badge">Database Systems</span>
-                    <span class="skill-badge">Operating Systems</span>
-                    <span class="skill-badge">Computer Networks</span>
                 </div>
             </div>
             
             <div class="bio-section">
-                <h3>Penetration Testing Focus</h3>
-                <p>As a junior penetration tester, I've been developing practical skills in identifying vulnerabilities and securing systems. My areas of interest include:</p>
+                <h3>Core Skills</h3>
+                
+                <p><strong>Technical Skills:</strong></p>
                 <div class="skills-list">
                     <span class="skill-badge">Web Application Security</span>
-                    <span class="skill-badge">Network Penetration</span>
-                    <span class="skill-badge">Vulnerability Assessment</span>
-                    <span class="skill-badge">OSINT</span>
-                    <span class="skill-badge">Social Engineering</span>
-                    <span class="skill-badge">CTF Challenges</span>
-                </div>
-                <p style="margin-top: 15px;">I regularly practice on platforms like TryHackMe to sharpen my skills and stay current with emerging threats and mitigation techniques.</p>
-            </div>
-            
-            <div class="bio-section">
-                <h3>Technical Skills</h3>
-                <p><strong>Programming Languages:</strong></p>
-                <div class="skills-list">
-                    <span class="skill-badge">Python</span>
-                    <span class="skill-badge">Bash</span>
-                    <span class="skill-badge">C/C++</span>
-                    <span class="skill-badge">JavaScript</span>
-                    <span class="skill-badge">SQL</span>
+                    <span class="skill-badge">Network Security</span>
+                    <span class="skill-badge">Active Directory Attacks</span>
+                    <span class="skill-badge">Privilege Escalation</span>
+                    <span class="skill-badge">Mobile Security</span>
+                    <span class="skill-badge">Vulnerability Exploitation</span>
                 </div>
                 
-                <p><strong>Tools & Technologies:</strong></p>
+                <p style="margin-top: 20px;"><strong>Tools & Platforms:</strong></p>
                 <div class="skills-list">
-                    <span class="skill-badge">Kali Linux</span>
                     <span class="skill-badge">Burp Suite</span>
                     <span class="skill-badge">Metasploit</span>
                     <span class="skill-badge">Nmap</span>
-                    <span class="skill-badge">Wireshark</span>
-                    <span class="skill-badge">OWASP ZAP</span>
+                    <span class="skill-badge">SQLmap</span>
+                    <span class="skill-badge">Gobuster</span>
                     <span class="skill-badge">Hydra</span>
-                    <span class="skill-badge">Sqlmap</span>
+                    <span class="skill-badge">John the Ripper</span>
+                    <span class="skill-badge">Kali Linux</span>
+                </div>
+
+                <p style="margin-top: 20px;"><strong>Programming & Scripting:</strong></p>
+                <div class="skills-list">
+                    <span class="skill-badge">Python</span>
+                    <span class="skill-badge">Bash</span>
+                    <span class="skill-badge">C</span>
+                    <span class="skill-badge">JavaScript</span>
+                    <span class="skill-badge">PHP</span>
+                    <span class="skill-badge">SQL</span>
+                    <span class="skill-badge">PowerShell</span>
                 </div>
             </div>
             
             <div class="bio-section">
-                <h3>Certifications & Learning Path</h3>
-                <p>I'm actively working toward industry certifications while building hands-on experience:</p>
-                <a href="https://www.coursera.org/account/accomplishments/verify/L2DTAN7L67A3" target="_blank"><span class="cert-badge">EC-council - EHE</span></a>
-                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" target="_blank"><span class="cert-badge">TryHackMe - Pre Security</span></a>
-                <a href="https://coursera.org/share/382ce05b0ad6eb2e117f766bfe34f9fc" target="_blank"><span class="cert-badge">Google - IT Automation with python</span></a>
+                <h3>Certifications</h3>
                 
-                <p style="margin-top: 15px;"><strong>Target Certifications:</strong></p>
-                <span class="cert-badge">CompTIA Security+</span>
-                <span class="cert-badge">eJPT</span>
-                <span class="cert-badge">OSCP (future goal)</span>
+                <p><strong>In Progress:</strong></p>
+                <span class="cert-badge in-progress">eWPTX - Web Application Penetration Tester eXtreme (INE Security)</span>
+                <span class="cert-badge in-progress">eMAPT - Mobile Application Penetration Tester (INE Security)</span>
+                
+                <p style="margin-top: 20px;"><strong>Completed Certifications:</strong></p>
+                <span class="cert-badge">Certified Red Team Analyst (CRTA) - Oct. 2025</span>
+                <span class="cert-badge">TryHackMe - Red Teaming Tester Path - Sep. 2025</span>
+                <span class="cert-badge">Cisco CCNA - Jun. 2025</span>
+                <span class="cert-badge">Google IT Support Professional - Jul. 2025</span>
+                <span class="cert-badge">TryHackMe - Junior Penetration Tester Path - Jun. 2025</span>
+                <span class="cert-badge">Google IT Automation with Python - Feb. 2025</span>
             </div>
             
             <div class="bio-section">
                 <h3>Philosophy</h3>
-                <p>I believe that understanding how to break systems is fundamental to building secure ones. My approach to cybersecurity is methodical, ethical, and focused on continuous learning.</p>
-                <p>By sharing knowledge and contributing to the security community, I aim to help create a safer digital environment for everyone.</p>
+                <p>I believe that understanding how to break systems is fundamental to building secure ones. My approach to cybersecurity is methodical, ethical, and focused on continuous learning. Through hands-on practice, bug bounty hunting, and CTF competitions, I constantly push my boundaries to stay ahead of emerging threats.</p>
+                <p>By sharing knowledge and contributing to the security community, I aim to help create a safer digital environment for everyone. Every vulnerability discovered and responsibly disclosed makes the internet a little bit safer.</p>
             </div>
         </div>
         
-        <div class="badge-container">
-            <iframe src="https://tryhackme.com/api/v2/badges/public-profile?userPublicId=3584664"></iframe>
-        </div>
     </div>
     
     <footer class="footer">
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
                 LinkedIn
             </a>
             <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
@@ -315,8 +424,11 @@
             <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
                 GitHub
             </a>
+            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+                HackerOne
+            </a>
         </div>
-        <p style="margin-top: 10px;">© 2025 Adham Khairy | All rights reserved</p>
+        <p style="margin-top: 10px;">© 2025 Adham Khairy (0xSponge) | All rights reserved</p>
     </footer>
 </body>
 </html>
