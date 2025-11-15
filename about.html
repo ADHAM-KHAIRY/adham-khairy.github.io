@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0xSponge - About</title>
+    <title>0xSponge</title>
     <style>
         :root {
             --bg-primary: #13151a;
@@ -242,18 +242,87 @@
         }
         
         @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
             header {
-                flex-direction: column;
-                gap: 15px;
+                padding: 12px 15px;
             }
             
             .nav-links {
-                width: 100%;
-                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
             }
-
+            
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .terminal-header {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            
+            .bio-section {
+                padding: 15px;
+            }
+            
+            .bio-section h3 {
+                font-size: 1.1rem;
+            }
+            
             .experience-header {
                 flex-direction: column;
+                gap: 5px;
+            }
+            
+            .experience-title {
+                font-size: 1rem;
+            }
+            
+            .skills-list {
+                gap: 8px;
+            }
+            
+            .skill-badge, .cert-badge {
+                font-size: 0.85rem;
+                padding: 4px 8px;
+            }
+            
+            .social-icons {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .footer {
+                padding: 15px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .terminal-header {
+                font-size: 0.7rem;
+                overflow-x: auto;
+            }
+            
+            .bio-section h3 {
+                font-size: 1rem;
+            }
+            
+            .bio-section p {
+                font-size: 0.9rem;
             }
         }
 
@@ -264,7 +333,7 @@
         <nav class="nav-links">
             <a href="index.html" class="nav-link">Home</a>
             <a href="about.html" class="nav-link active">About</a>
-            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="blog.html" class="nav-link">Blog</a>
             <a href="contact.html" class="nav-link">Contact</a>
         </nav>
     </header>
@@ -411,20 +480,20 @@
             </div>
         </div>
         
+        <div class="badge-container">
+            <iframe src="https://tryhackme.com/api/v2/badges/public-profile?userPublicId=3584664"></iframe>
+        </div>
     </div>
     
     <footer class="footer">
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
                 LinkedIn
             </a>
-            <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
+            <a href="https://tryhackme.com/p/0xAdham" class="social-icon" target="_blank">
                 TryHackMe
             </a>
-            <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
-                GitHub
-            </a>
-            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+            <a href="https://hackerone.com/0xadham?type=user" class="social-icon" target="_blank">
                 HackerOne
             </a>
         </div>
