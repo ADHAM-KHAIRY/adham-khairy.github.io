@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Penetration Tester Portfolio</title>
+    <title>0xSponge - Contact</title>
     <style>
         :root {
             --bg-primary: #13151a;
@@ -407,25 +407,6 @@
             display: none;
         }
         
-        .typing-animation {
-            border-right: 2px solid var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            margin: 0;
-            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-        }
-        
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--accent) }
-        }
-        
-        /* Status message styles */
         .status-message {
             padding: 15px;
             border-radius: 4px;
@@ -446,7 +427,6 @@
             color: var(--error-red);
         }
         
-        /* Responsive design */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -486,7 +466,7 @@
 [*] Checking encryption protocols...
 [+] <span class="success">Connection established!</span>
 [+] <span class="success">Channel secured with AES-256 encryption</span>
-[*] Welcome to <span class="highlight">Adham Khairy's</span> secure contact interface
+[*] Welcome to <span class="highlight">0xSponge's</span> secure contact interface
 [*] You may proceed with your message...
                 </div>
             </div>
@@ -499,7 +479,7 @@
                 <div class="contact-icon">✉️</div>
                 <h3 class="contact-title">Email</h3>
                 <p class="contact-value">
-                    <a href="mailto:adham.khairy@example.com">adham.khairy@example.com</a>
+                    <a href="mailto:adhamkhairy2020@gmail.com">adhamkhairy2020@gmail.com</a>
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     (Encrypted communication preferred)
@@ -521,7 +501,7 @@
                 <div class="contact-icon">🔗</div>
                 <h3 class="contact-title">LinkedIn</h3>
                 <p class="contact-value">
-                    <a href="https://www.linkedin.com/in/adham-khairy-985834323/" target="_blank">adham-khairy</a>
+                    <a href="https://www.linkedin.com/in/adhamkhairy" target="_blank">adhamkhairy</a>
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     Connect with me professionally
@@ -536,6 +516,28 @@
                 </p>
                 <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
                     Follow my CTF journey
+                </p>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">🐛</div>
+                <h3 class="contact-title">HackerOne</h3>
+                <p class="contact-value">
+                    <a href="https://hackerone.com/0xsponge" target="_blank">0xsponge</a>
+                </p>
+                <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
+                    Bug bounty profile
+                </p>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">📞</div>
+                <h3 class="contact-title">Phone</h3>
+                <p class="contact-value">
+                    <a href="tel:+201550273344">(+20) 155-027-3344</a>
+                </p>
+                <p class="contact-value" style="margin-top: 10px; font-size: 0.8rem;">
+                    Available for professional inquiries
                 </p>
             </div>
         </div>
@@ -619,7 +621,7 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
     
     <footer class="footer">
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
+            <a href="https://www.linkedin.com/in/adhamkhairy" class="social-icon" target="_blank">
                 LinkedIn
             </a>
             <a href="https://tryhackme.com/p/justbeing.adham" class="social-icon" target="_blank">
@@ -628,12 +630,14 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
             <a href="https://github.com/ADHAM-KHAIRY" class="social-icon" target="_blank">
                 GitHub
             </a>
+            <a href="https://hackerone.com/0xsponge" class="social-icon" target="_blank">
+                HackerOne
+            </a>
         </div>
-        <p style="margin-top: 10px;">© 2025 Adham Khairy | All rights reserved</p>
+        <p style="margin-top: 10px;">© 2025 Adham Khairy (0xSponge) | All rights reserved</p>
     </footer>
 
     <script>
-        // Form validation
         function validateForm() {
             let isValid = true;
             const name = document.getElementById('name').value.trim();
@@ -641,38 +645,32 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
             const subject = document.getElementById('subject').value.trim();
             const message = document.getElementById('message').value.trim();
             
-            // Reset previous error messages
             document.querySelectorAll('.form-error').forEach(el => {
                 el.style.display = 'none';
             });
             
-            // Validate name
             if (name === '') {
                 document.getElementById('nameError').style.display = 'block';
                 isValid = false;
             }
             
-            // Validate email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 document.getElementById('emailError').style.display = 'block';
                 isValid = false;
             }
             
-            // Validate subject
             if (subject === '') {
                 document.getElementById('subjectError').style.display = 'block';
                 isValid = false;
             }
             
-            // Validate message
             if (message === '') {
                 document.getElementById('messageError').style.display = 'block';
                 isValid = false;
             }
             
             if (isValid) {
-                // Show success message (in a real application, you would submit the form to your server here)
                 const statusMessage = document.getElementById('statusMessage');
                 statusMessage.className = 'status-message status-success';
                 statusMessage.innerHTML = `
@@ -681,26 +679,20 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
                 `;
                 statusMessage.style.display = 'block';
                 
-                // Reset form
                 document.getElementById('contactForm').reset();
-                
-                // Scroll to status message
                 statusMessage.scrollIntoView({ behavior: 'smooth' });
                 
-                // Hide success message after 5 seconds
                 setTimeout(() => {
                     statusMessage.style.display = 'none';
                 }, 5000);
             }
             
-            return false; // Prevent actual form submission
+            return false;
         }
         
-        // Copy PGP key to clipboard
         document.getElementById('copyPgpBtn').addEventListener('click', function() {
             const pgpKey = document.getElementById('pgpKey').innerText;
             
-            // Create a temporary textarea element to copy from
             const textarea = document.createElement('textarea');
             textarea.value = pgpKey;
             textarea.setAttribute('readonly', '');
@@ -708,31 +700,25 @@ aXJ5QGV4YW1wbGUuY29tPokBVAQTAQgAPhYhBKrOd+oD0P32v1LxVlg6bECM
             textarea.style.left = '-9999px';
             document.body.appendChild(textarea);
             
-            // Select and copy
             textarea.select();
             document.execCommand('copy');
-            
-            // Remove the temporary element
             document.body.removeChild(textarea);
             
-            // Update button text temporarily
             const originalText = this.innerHTML;
             this.innerHTML = '<span class="copy-icon">✓</span> Copied!';
             
-            // Restore original button text after 2 seconds
             setTimeout(() => {
                 this.innerHTML = originalText;
             }, 2000);
         });
         
-        // Add console typing effect
         document.addEventListener('DOMContentLoaded', function() {
             const consoleOutput = document.querySelector('.console-output');
             const originalText = consoleOutput.innerHTML;
             consoleOutput.innerHTML = '';
             
             let i = 0;
-            const speed = 20; // Typing speed in milliseconds
+            const speed = 20;
             
             function typeWriter() {
                 if (i < originalText.length) {
