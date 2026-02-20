@@ -108,10 +108,19 @@
             border-color: var(--accent);
             box-shadow: 0 5px 15px rgba(107, 209, 255, 0.2);
         }
+
+        .blog-card-thumbnail {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
         
         .blog-title {
             color: var(--accent);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 10px;
             font-weight: bold;
             line-height: 1.4;
@@ -123,25 +132,142 @@
             margin-bottom: 15px;
             flex-grow: 1;
             line-height: 1.5;
+            /* Clamp to 3 lines */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
         .blog-meta {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             margin-top: auto;
             padding-top: 15px;
             border-top: 1px solid var(--border);
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .blog-date {
             color: var(--text-secondary);
             font-size: 0.85rem;
         }
+
+        .blog-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .blog-tag {
+            background-color: rgba(107, 209, 255, 0.08);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(107, 209, 255, 0.2);
+        }
         
         .blog-link {
             text-decoration: none;
             color: inherit;
+        }
+
+        /* Loading & error states */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+        }
+
+        .loading-text .cursor-blink {
+            display: inline-block;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .error-state {
+            background-color: rgba(255, 100, 100, 0.05);
+            border: 1px solid rgba(255, 100, 100, 0.2);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            color: #ff8080;
+            margin-top: 30px;
+        }
+
+        .error-state code {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Skeleton loader cards */
+        .skeleton-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .skeleton-thumb {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(90deg, var(--border) 25%, #2e3140 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .skeleton-line {
+            height: 14px;
+            background: linear-gradient(90deg, var(--border) 25%, #2e3140 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
+        .skeleton-line.full { width: 100%; }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .read-more {
+            color: var(--accent);
+            font-size: 0.8rem;
+            margin-top: 8px;
+            opacity: 0.7;
         }
         
         .footer {
@@ -201,126 +327,180 @@
     
     <div class="container">
         <div class="terminal-header">
-            root@kali:~$ ls -la ~/writeups/
+            root@kali:~$ curl -s https://0xsponge.medium.com/feed | parse_rss
         </div>
         
         <h2 class="section-title">CTF Writeups & Security Research</h2>
-        
-        <div class="blog-grid">
-            <a href="https://medium.com/@adhamkhairy2020/challenges-writeup-flaghunter-2-0-ctf-8bd3939a31b3" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">Challenges Writeup | Flaghunter 2.0 CTF</h3>
-                    <p class="blog-description">Hey folks, I'm Adham Khairy — aka 0xSponge. Over the last 48 hours I went solo into Flaghunter 2.0 CTF, hosted by Security BSides Vizag…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Nov 5, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
 
-            <a href="https://medium.com/@adhamkhairy2020/tob-web-challenge-helwan-ctf-2609d0359784" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">[Tob] WEB challenge — Helwan CTF</h3>
-                    <p class="blog-description">Hi — I'm Adham (aka 0xSponge). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web challenges solo. This writeup…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Sep 18, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/out-of-order-revenge-web-challenge-helwan-ctf-fbd768c089ed" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">[Out Of Order — Revenge] WEB challenge — Helwan CTF</h3>
-                    <p class="blog-description">Hi — I'm Adham (aka 0xSponge). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web challenges solo. This writeup…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Sep 18, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/tryhackme-enterprise-279ba5a4d6a1" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">TryHackMe | Enterprise</h3>
-                    <p class="blog-description">You just landed in an internal network. You scan the network and there's only the Domain Controller…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Aug 23, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/tryhackme-vulnnet-active-a94178765c93" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">TryHackMe: Vulnnet: Active</h3>
-                    <p class="blog-description">Step one of any CTF diet plan: Nmap. Because if you don't scan first, did you even pentest?</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Aug 19, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/remote-code-execution-via-polyglot-web-shell-upload-portswigger-lab-39e885fb48ff" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">Remote Code Execution via Polyglot Web Shell Upload — PortSwigger Lab</h3>
-                    <p class="blog-description">"When One File Speaks Two Languages: Exploiting Polyglots for RCE"</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Aug 6, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/hacker-vs-hacker-tryhackme-writeup-ac4efaa0549f" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">Hacker vs. Hacker — TryHackMe writeup</h3>
-                    <p class="blog-description">A recruitment company's server has been hacked, and the attacker has blocked all admin recovery attempts. Shutting it down would hurt…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Aug 1, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/cmspit-tryhackme-walkthrough-6aa8e3b1065a" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">CMSpit — TryHackMe WalkThrough</h3>
-                    <p class="blog-description">In this room, we exploited a vulnerable CMS using known CVEs, gained initial access via reverse shell, and escalated privileges using…</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Jul 1, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
-
-            <a href="https://medium.com/@adhamkhairy2020/tryhackme-mr-robotwalkthrough-1846765ffd5a" class="blog-link" target="_blank">
-                <div class="blog-card">
-                    <h3 class="blog-title">TryHackMe Mr. Robot Walkthrough</h3>
-                    <p class="blog-description">Today, I was hanging out with my friend Elliot, and he said, "Adham! Could you help me solve the Mr. Robot room on TryHackMe?"</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">Jul 1, 2024</span>
-                        
-                    </div>
-                </div>
-            </a>
+        <!-- Skeleton loaders shown while fetching -->
+        <div class="blog-grid" id="blog-grid">
+            <div class="skeleton-card">
+                <div class="skeleton-thumb"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-thumb"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-thumb"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+            </div>
         </div>
     </div>
     
     <footer class="footer">
         <div class="social-icons">
-            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">
-                LinkedIn
-            </a>
-            <a href="https://tryhackme.com/p/0xAdham" class="social-icon" target="_blank">
-                TryHackMe
-            </a>
-            <a href="https://hackerone.com/0xadham?type=user" class="social-icon" target="_blank">
-                HackerOne
-            </a>
+            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" class="social-icon" target="_blank">LinkedIn</a>
+            <a href="https://tryhackme.com/p/0xAdham" class="social-icon" target="_blank">TryHackMe</a>
+            <a href="https://hackerone.com/0xadham?type=user" class="social-icon" target="_blank">HackerOne</a>
         </div>
         <p style="margin-top: 10px;">© 2025 Adham Khairy (0xSponge) | All rights reserved</p>
     </footer>
+
+    <script>
+        /**
+         * Fetches Medium RSS feed via rss2json API (no CORS issues, free tier).
+         * Falls back to a second proxy if the first fails.
+         */
+        const MEDIUM_FEED_URL = 'https://0xsponge.medium.com/feed';
+        const RSS2JSON_API    = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+        // Secondary proxy using allorigins (returns raw XML which we parse manually)
+        const ALLORIGINS_API  = `https://api.allorigins.win/get?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+
+        const grid = document.getElementById('blog-grid');
+
+        // ── Helper: strip HTML tags and return plain text excerpt ──────────────
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        // ── Helper: extract first <img> src from HTML string ───────────────────
+        function extractImage(html) {
+            const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+            return match ? match[1] : null;
+        }
+
+        // ── Helper: format ISO date to "Mon DD, YYYY" ─────────────────────────
+        function formatDate(dateStr) {
+            try {
+                return new Date(dateStr).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        // ── Render posts to the grid ───────────────────────────────────────────
+        function renderPosts(posts) {
+            if (!posts || posts.length === 0) {
+                showError('No posts found. Check back later!');
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            posts.forEach(post => {
+                const title       = post.title || 'Untitled';
+                const link        = post.link || post.url || '#';
+                const pubDate     = formatDate(post.pubDate || post.published);
+                const rawContent  = post.content || post.description || '';
+                const description = stripHtml(rawContent).slice(0, 200).trim() + '…';
+                const thumbnail   = post.thumbnail
+                                    || extractImage(rawContent)
+                                    || null;
+                const tags        = (post.categories || []).slice(0, 3);
+
+                const card = document.createElement('a');
+                card.href   = link;
+                card.target = '_blank';
+                card.rel    = 'noopener noreferrer';
+                card.className = 'blog-link';
+
+                card.innerHTML = `
+                    <div class="blog-card">
+                        ${thumbnail ? `<img class="blog-card-thumbnail" src="${thumbnail}" alt="${title}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        <h3 class="blog-title">${title}</h3>
+                        <p class="blog-description">${description}</p>
+                        <div class="blog-meta">
+                            <span class="blog-date">${pubDate}</span>
+                            ${tags.length ? `<div class="blog-tags">${tags.map(t => `<span class="blog-tag">${t}</span>`).join('')}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // ── Show error state ───────────────────────────────────────────────────
+        function showError(msg, detail) {
+            grid.innerHTML = `
+                <div class="error-state" style="grid-column: 1/-1;">
+                    <div>[!] ${msg}</div>
+                    ${detail ? `<code>${detail}</code>` : ''}
+                    <div style="margin-top:12px; font-size:0.85rem;">
+                        View posts directly on 
+                        <a href="https://0xsponge.medium.com" target="_blank" 
+                           style="color: var(--accent);">Medium →</a>
+                    </div>
+                </div>`;
+        }
+
+        // ── Primary fetch: rss2json ────────────────────────────────────────────
+        async function fetchViaRss2Json() {
+            const res  = await fetch(RSS2JSON_API);
+            const data = await res.json();
+            if (data.status !== 'ok') throw new Error(data.message || 'rss2json error');
+            return data.items;
+        }
+
+        // ── Secondary fetch: allorigins (raw XML) ─────────────────────────────
+        async function fetchViaAllOrigins() {
+            const res  = await fetch(ALLORIGINS_API);
+            const data = await res.json();
+            const xml  = new DOMParser().parseFromString(data.contents, 'text/xml');
+            const items = [...xml.querySelectorAll('item')];
+            return items.map(item => ({
+                title    : item.querySelector('title')?.textContent,
+                link     : item.querySelector('link')?.textContent
+                            || item.querySelector('guid')?.textContent,
+                pubDate  : item.querySelector('pubDate')?.textContent,
+                content  : item.querySelector('encoded')?.textContent
+                            || item.querySelector('description')?.textContent,
+                thumbnail: extractImage(
+                    item.querySelector('encoded')?.textContent
+                    || item.querySelector('description')?.textContent || ''
+                ),
+                categories: [...item.querySelectorAll('category')].map(c => c.textContent)
+            }));
+        }
+
+        // ── Bootstrap ─────────────────────────────────────────────────────────
+        (async () => {
+            try {
+                const posts = await fetchViaRss2Json();
+                renderPosts(posts);
+            } catch (err1) {
+                console.warn('rss2json failed, trying allorigins…', err1);
+                try {
+                    const posts = await fetchViaAllOrigins();
+                    renderPosts(posts);
+                } catch (err2) {
+                    console.error('Both proxies failed', err2);
+                    showError('Unable to load posts automatically.', err2.message);
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
