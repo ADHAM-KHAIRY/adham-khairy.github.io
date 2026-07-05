@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — CTF Writeups & Security Research | 0xSponge</title>
+    <meta name="description" content="CTF writeups and offensive security research by Adham Khairy (0xSponge), pulled live from Medium.">
+    <meta name="author" content="Adham Khairy">
+    <meta property="og:title" content="Blog — 0xSponge">
+    <meta property="og:description" content="CTF writeups and offensive security research.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://0xsponge.me/blog.html">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧽</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html">0x<span>Sponge</span></a>
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="blog.html" class="active">Blog</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="sign"><span class="emoji">🫧</span> Fresh writeups from the deep</div>
+
+        <section class="section">
+            <div class="section-head"><span class="idx">//</span><h2>Writeups &amp; Research</h2></div>
+            <p class="page-intro">CTF writeups and offensive security notes, pulled live from Medium.</p>
+
+            <div class="blog-grid" id="blog-grid">
+                <div class="skeleton-card">
+                    <div class="skeleton-thumb"></div>
+                    <div class="skeleton-line full"></div>
+                    <div class="skeleton-line medium"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-thumb"></div>
+                    <div class="skeleton-line full"></div>
+                    <div class="skeleton-line medium"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-thumb"></div>
+                    <div class="skeleton-line full"></div>
+                    <div class="skeleton-line medium"></div>
+                    <div class="skeleton-line short"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/adham-khairy-985834323/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a href="https://tryhackme.com/p/0xAdham" target="_blank" rel="noopener" aria-label="TryHackMe profile">TryHackMe</a>
+            <a href="https://app.hackthebox.com/users/2482072" target="_blank" rel="noopener" aria-label="Hack The Box profile">HackTheBox</a>
+            <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
+        </div>
+        <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
+    </footer>
+
+    <script>
+        /**
+         * Fetches Medium RSS feed via rss2json API (no CORS issues, free tier).
+         * Falls back to a second proxy if the first fails.
+         */
+        const MEDIUM_FEED_URL = 'https://0xsponge.medium.com/feed';
+        const RSS2JSON_API    = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+        const ALLORIGINS_API  = `https://api.allorigins.win/get?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+
+        const grid = document.getElementById('blog-grid');
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function extractImage(html) {
+            const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+            return match ? match[1] : null;
+        }
+
+        function formatDate(dateStr) {
+            try {
+                return new Date(dateStr).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function renderPosts(posts) {
+            if (!posts || posts.length === 0) {
+                showError('No posts found. Check back later!');
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            posts.forEach(post => {
+                const title       = escapeHtml(post.title || 'Untitled');
+                const link        = post.link || post.url || '#';
+                const pubDate     = formatDate(post.pubDate || post.published);
+                const rawContent  = post.content || post.description || '';
+                const description = escapeHtml(stripHtml(rawContent).slice(0, 200).trim()) + '…';
+                const thumbnail   = post.thumbnail || extractImage(rawContent) || null;
+                const tags        = (post.categories || []).slice(0, 3);
+
+                const card = document.createElement('a');
+                card.href      = link;
+                card.target    = '_blank';
+                card.rel       = 'noopener noreferrer';
+                card.className = 'blog-link';
+
+                card.innerHTML = `
+                    <div class="blog-card">
+                        ${thumbnail ? `<img class="blog-card-thumbnail" src="${thumbnail}" alt="${title}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        <h3 class="blog-title">${title}</h3>
+                        <p class="blog-description">${description}</p>
+                        <div class="blog-meta">
+                            <span class="blog-date">${pubDate}</span>
+                            ${tags.length ? `<div class="blog-tags">${tags.map(t => `<span class="blog-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function showError(msg, detail) {
+            grid.innerHTML = `
+                <div class="error-state">
+                    <div>[!] ${msg}</div>
+                    ${detail ? `<code>${detail}</code>` : ''}
+                    <div style="margin-top:12px; font-size:0.85rem;">
+                        View posts directly on
+                        <a href="https://0xsponge.medium.com" target="_blank" rel="noopener">Medium →</a>
+                    </div>
+                </div>`;
+        }
+
+        async function fetchViaRss2Json() {
+            const res  = await fetch(RSS2JSON_API);
+            const data = await res.json();
+            if (data.status !== 'ok') throw new Error(data.message || 'rss2json error');
+            return data.items;
+        }
+
+        async function fetchViaAllOrigins() {
+            const res  = await fetch(ALLORIGINS_API);
+            const data = await res.json();
+            const xml  = new DOMParser().parseFromString(data.contents, 'text/xml');
+            const items = [...xml.querySelectorAll('item')];
+            return items.map(item => ({
+                title    : item.querySelector('title')?.textContent,
+                link     : item.querySelector('link')?.textContent
+                            || item.querySelector('guid')?.textContent,
+                pubDate  : item.querySelector('pubDate')?.textContent,
+                content  : item.querySelector('encoded')?.textContent
+                            || item.querySelector('description')?.textContent,
+                thumbnail: extractImage(
+                    item.querySelector('encoded')?.textContent
+                    || item.querySelector('description')?.textContent || ''
+                ),
+                categories: [...item.querySelectorAll('category')].map(c => c.textContent)
+            }));
+        }
+
+        (async () => {
+            try {
+                const posts = await fetchViaRss2Json();
+                renderPosts(posts);
+            } catch (err1) {
+                console.warn('rss2json failed, trying allorigins…', err1);
+                try {
+                    const posts = await fetchViaAllOrigins();
+                    renderPosts(posts);
+                } catch (err2) {
+                    console.error('Both proxies failed', err2);
+                    showError('Unable to load posts automatically.', err2.message);
+                }
+            }
+        })();
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
