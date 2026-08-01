@@ -70,13 +70,16 @@
 
 <script>
     /**
-     * Fetches the Medium RSS feed.
-     * Primary: AllOrigins (proxies the live feed, no server-side cache).
-     * Fallback: rss2json (convenient, but its free tier serves stale cached feeds).
+     * Fetches the Medium RSS feed through a chain of CORS proxies.
+     * Tries live-feed proxies first; rss2json is last because its free
+     * tier serves a cached feed that can lag behind by hours.
      */
     const MEDIUM_FEED_URL = 'https://0xsponge.medium.com/feed';
-    const RSS2JSON_API    = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
-    const ALLORIGINS_API  = `https://api.allorigins.win/get?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+
+    const RSS2JSON_API   = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+    const ALLORIGINS_GET = `https://api.allorigins.win/get?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+    const ALLORIGINS_RAW = `https://api.allorigins.win/raw?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
+    const CORSPROXY_API  = `https://corsproxy.io/?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
 
     const grid = document.getElementById('blog-grid');
 
@@ -164,12 +167,8 @@
             </div>`;
     }
 
-    async function fetchViaAllOrigins() {
-        const res  = await fetch(ALLORIGINS_API + bust(), { cache: 'no-store' });
-        const data = await res.json();
-        if (!data || !data.contents) throw new Error('allorigins returned no content');
-
-        const xml = new DOMParser().parseFromString(data.contents, 'text/xml');
+    function parseFeedXml(xmlText) {
+        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
         if (xml.querySelector('parsererror')) throw new Error('feed XML parse error');
 
         const items = [...xml.querySelectorAll('item')];
@@ -191,25 +190,55 @@
         });
     }
 
-    async function fetchViaRss2Json() {
-        const res  = await fetch(RSS2JSON_API + '&count=12' + bust(), { cache: 'no-store' });
-        const data = await res.json();
-        if (data.status !== 'ok') throw new Error(data.message || 'rss2json error');
-        return data.items;
+    async function fetchText(url) {
+        const res = await fetch(url + bust(), { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
     }
 
-    (async () => {
-        try {
-            renderPosts(await fetchViaAllOrigins());
-        } catch (err1) {
-            console.warn('allorigins failed, trying rss2json…', err1);
-            try {
-                renderPosts(await fetchViaRss2Json());
-            } catch (err2) {
-                console.error('Both proxies failed', err2);
-                showError('Unable to load posts automatically.', err2.message);
+    const STRATEGIES = [
+        {
+            name: 'allorigins/raw',
+            run : async () => parseFeedXml(await fetchText(ALLORIGINS_RAW))
+        },
+        {
+            name: 'allorigins/get',
+            run : async () => {
+                const data = JSON.parse(await fetchText(ALLORIGINS_GET));
+                if (!data || !data.contents) throw new Error('no contents field');
+                return parseFeedXml(data.contents);
+            }
+        },
+        {
+            name: 'corsproxy.io',
+            run : async () => parseFeedXml(await fetchText(CORSPROXY_API))
+        },
+        {
+            name: 'rss2json (may be stale)',
+            run : async () => {
+                const data = JSON.parse(await fetchText(RSS2JSON_API));
+                if (data.status !== 'ok') throw new Error(data.message || 'rss2json error');
+                return data.items;
             }
         }
+    ];
+
+    (async () => {
+        const failures = [];
+
+        for (const strategy of STRATEGIES) {
+            try {
+                const posts = await strategy.run();
+                console.info(`[blog] loaded via ${strategy.name}`);
+                renderPosts(posts);
+                return;
+            } catch (err) {
+                console.warn(`[blog] ${strategy.name} failed:`, err);
+                failures.push(`${strategy.name}: ${err.message}`);
+            }
+        }
+
+        showError('Unable to load posts automatically.', failures.join(' | '));
     })();
 </script>
     <script src="app.js"></script>
