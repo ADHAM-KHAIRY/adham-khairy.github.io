@@ -44,6 +44,16 @@ ALLOWED_ATTRS = {
     'img': {'src', 'alt'},
 }
 
+# Medium closes every feed item with a 1px view-counter and a "was originally
+# published in ..." footer. The pixel would phone home from this domain (and
+# renders as a broken image), and the footer duplicates the canonical note the
+# template already prints.
+TRACKER_SRC = re.compile(r'https?://medium\.com/_/stat', re.I)
+MEDIUM_FOOTER = re.compile(
+    r'\s*(?:<hr>)?\s*<p>(?:(?!</p>).)*?was originally published in(?:(?!</p>).)*?</p>\s*$',
+    re.S | re.I,
+)
+
 
 class Sanitizer(HTMLParser):
     """Allowlist filter. Drops unknown tags, every event handler and any
@@ -67,6 +77,8 @@ class Sanitizer(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if tag not in ALLOWED:
+            return
+        if tag == 'img' and any(n == 'src' and TRACKER_SRC.match(v or '') for n, v in attrs):
             return
         rendered = self._attrs(tag, attrs)
         if tag == 'a':
@@ -110,7 +122,9 @@ def sanitize(html):
     p = Sanitizer()
     p.feed(html or '')
     p.close()
-    return p.result()
+    out = MEDIUM_FOOTER.sub('', p.result())
+    # the pixel usually sat inside its own <figure>, now empty
+    return re.sub(r'<figure>\s*</figure>', '', out).strip()
 
 
 def strip_tags(html):
