@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging Endpoints Nobody Bothers to Test Leads to Some Crits — 0xSponge</title>
+    <meta name="description" content="How Reading Two Lines in the Debugger Turned a Cookie Policy Page Into a Crit. The URL was this boring: https://app.example.com/cookie-policy/es/es A cookie pol">
+    <meta name="author" content="Adham Khairy">
+    <link rel="canonical" href="https://infosecwriteups.com/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits-579eb9fbceb7">
+    <meta property="og:title" content="Debugging Endpoints Nobody Bothers to Test Leads to Some Crits">
+    <meta property="og:description" content="How Reading Two Lines in the Debugger Turned a Cookie Policy Page Into a Crit. The URL was this boring: https://app.example.com/cookie-policy/es/es A cookie pol">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://0xsponge.me/posts/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits.html">
+    <meta property="article:published_time" content="2026-09-05">
+    <meta property="og:image" content="https://cdn-images-1.medium.com/max/1024/1*Zz7H9xZpGerZtzmg-in3eA.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧽</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="../index.html">0x<span>Sponge</span></a>
+        <nav class="nav">
+            <a href="../index.html">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../blog.html" class="active">Blog</a>
+            <a href="../contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-link" href="../blog.html">← All writeups</a>
+
+        <article class="post">
+            <h1 class="post-title">Debugging Endpoints Nobody Bothers to Test Leads to Some Crits</h1>
+            <div class="post-meta">
+                <span>Sep 5, 2026</span>
+                <span>·</span>
+                <span>4 min read</span>
+                <div class="blog-tags"><span class="blog-tag">bug-bounty</span><span class="blog-tag">penetration-testing</span><span class="blog-tag">cybersecurity</span></div>
+            </div>
+
+            <div class="post-body">
+<figure><img src="https://cdn-images-1.medium.com/max/1024/1*Zz7H9xZpGerZtzmg-in3eA.png"></figure><p>How Reading Two Lines in the Debugger Turned a Cookie Policy Page Into a Crit.</p><p>The URL was this boring:</p><pre>https://app.example.com/cookie-policy/es/es</pre><p>A cookie policy page. With a locale in the path. That’s it.</p><p>Nobody tests this. You see /cookie-policy/ in a scope and your eyes slide right past it on the way to the login flow, the file upload, the payment endpoint… anywhere that actually <em>does</em> something. A page whose entire job is to display legal text about cookies is the least interesting thing on any target.</p><p>I opened the debugger on it anyway, mostly out of stubbornness.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*plzZpJZwCRA7sCMLzyn6FQ.png"></figure><p>The debugger told me it wasn’t a static page</p><p>I opened the page, opened DevTools, and started stepping.</p><p>No theory, no payload in mind. Just set a breakpoint early in the component and walked forward one line at a time, watching what the code did with itself.</p><p>And a few frames in, the assumption I’d walked in with fell apart.</p><p>I had been reading /cookie-policy/es/es the way you read any locale URL — as a <strong>static route</strong>. en is <strong>English</strong>. There's a <strong>English</strong> page. It serves the <strong>English</strong> page. Boring, done, move on. That's what the URL <em>looks</em> like it means.</p><p>Except the debugger showed me en wasn't selecting a page at all. It was being pulled out of the route as a <strong>value</strong>:</p><pre>const { language } = this.route.snapshot.params;</pre><p>That’s not routing. That’s <em>reading my INPUT</em>. The string I typed in the address bar was now a variable inside the application, and nothing had checked whether it was a real locale on the way in.</p><figure><img src="https://cdn-images-1.medium.com/proxy/1*qz6n15JeaQwe0whBI4s9lA.png"></figure><p>That reframes the whole page. A static locale route has no attack surface. A page that lifts a path segment into a variable has exactly as much attack surface as whatever it does with that variable next.</p><p>So I kept stepping. Slowly. Not hunting for a payload — just following my own string through the code, one line at a time, until I could see where it landed.</p><p>Two frames later:</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*2O_Yf0rvA-45rN-KwaQVWQ.png"></figure><pre>const link = AppConfig.cookieConsentFrameUrl + language;<br>trustArcWindow.html = trustArcWindow.html.replace("{path}", link);</pre><p>And I stopped reading.</p><h3>What those lines actually say</h3><p>Going back up: language comes straight out of the URL. No validation, no allow-list, no check that it's a real locale.</p><p>Then it gets <strong>concatenated onto a config URL.</strong> Not encodeURIComponent. Not a URL object. String concatenation.</p><p>Then the result gets shoved into an HTML template by replacing a {path} placeholder.</p><p>The template it lands in is an iframe:</p><pre>&lt;iframe width='100%' height='800' src='{path}'&gt;&lt;/iframe&gt;</pre><p>So my input goes directly into an HTML attribute, inside an HTML string, that is about to be rendered. I followed one more frame to find out how it gets rendered, and there it was:</p><pre>addHtml(u){ this.htmlContainer.nativeElement.innerHTML = u }</pre><p>Raw innerHTML, straight onto the DOM node.</p><p>This is Angular. Angular has a sanitizer. Angular <em>wants</em> to sanitize this for you — that’s the entire point of [innerHTML] binding. Someone reached past it to write to nativeElement directly, which turns the framework's built-in protection off.</p><p>Source and sink, four lines apart, with nothing in between.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*NWchuhR3DvY28KTaF2XIcw.png"></figure><p>The payload writes itself</p><p>Once you can see the sink, the payload isn’t creative work. You’re just closing what’s already open.</p><p>My value lands inside src='...'. So:</p><ul><li>A ' closes the attribute</li><li>&gt; closes the iframe's opening tag</li><li>&lt;/iframe&gt; — this one matters. Iframe children parse as raw text, so anything you inject <em>inside</em> the element is inert. You have to close it first to get back into parseable HTML.</li><li>Then whatever you want, as a sibling element</li></ul><p>Something along the lines of:</p><pre>'&gt;&lt;/iframe&gt;&lt;svg onload=...&gt;</pre><p>Load it in a clean tab, and script executes on the application’s own origin.</p><p>Which is where a cookie policy page stops being a cookie policy page. Same origin means the injected script sits inside the app’s security boundary — it can read the application’s own endpoints, touch whatever the logged-in user is in the middle of doing, and act as them against the backend. On this particular target that meant a workflow handling people’s personal submissions and document uploads.</p><p>The page was boring. The origin it ran on was not.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*y5MjmAJ9owxjMI3VNvigzA.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/1024/1*BU6uuviBIKDrKSyrMyVFqg.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/498/0*oOpMFZ1lpQafJjQw.gif"><figcaption>XSS WORKKKKKEDDDD!!!!!</figcaption></figure><h3>The actual lesson</h3><p>Here’s the pattern I want you to take from this, because it’s the reusable part.</p><p>Rendering localized content is a <strong>solved problem</strong>. Every framework has a way to do it. The boring version looks like this:</p><pre>@app.get("/{lang}")  →  return templates[lang]</pre><p>Look up the locale. Return the template. Done. There is no user input in the output.</p><p>When you find someone doing that same solved problem in a <em>custom</em> way — building URLs with +, patching HTML together with .replace(), writing to innerHTML when the framework offers a sanitized binding — that is a red flag every single time.</p><p>Not because custom code is bad. Because custom code means somebody decided the safe path didn’t fit their case, and stepped off it. Framework defaults are safe by design. Anything hand-rolled around them was written by a person who was thinking about making the feature work, not about what happens when a hostile string arrives.</p><p>Custom implementations of solved problems are where the bugs are.</p><p>And you only see them by putting a breakpoint in and reading, line by line, until you’re looking at where your input actually ends up. It’s slow, it’s not glamorous, and it’s why the finding was still sitting there for me on a page everybody else scrolled past.</p><p>👉 <strong>Don’t forget to follow me on</strong> <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener noreferrer"><strong>LinkedIn</strong></a> for more writeups and cybersecurity content!</p><p>👉 If you enjoyed this writeup, <strong>leave a like</strong> and <strong>follow me for more hacking content!</strong></p><img src="https://medium.com/_/stat?event=post.clientViewed&amp;referrerSource=full_rss&amp;postId=579eb9fbceb7" loading="lazy"><hr><p><a href="https://infosecwriteups.com/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits-579eb9fbceb7" target="_blank" rel="noopener noreferrer">Debugging Endpoints Nobody Bothers to Test Leads to Some Crits</a> was originally published in <a href="https://infosecwriteups.com" target="_blank" rel="noopener noreferrer">InfoSec Write-ups</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+            </div>
+
+            <p class="post-origin">
+                Originally published on
+                <a href="https://infosecwriteups.com/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits-579eb9fbceb7" target="_blank" rel="noopener">Medium ↗</a>
+            </p>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
+        </div>
+        <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+</html>

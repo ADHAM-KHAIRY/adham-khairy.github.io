@@ -1,0 +1,49 @@
+name: Sync content
+
+# Mirrors new Medium writeups into posts/ and refreshes the HackerOne figures.
+# Both fetches happen here rather than in the browser: Medium and HackerOne
+# send no CORS headers, and a visitor should never wait on a third party.
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # daily, 06:17 UTC
+  workflow_dispatch:        # Actions tab -> Run workflow
+  push:
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/sync-content.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-content
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Mirror Medium writeups
+        run: python3 scripts/build_blog.py
+
+      - name: Snapshot HackerOne stats
+        run: python3 scripts/build_hackerone.py
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts data
+          if git diff --cached --quiet; then
+            echo "nothing to sync"
+            exit 0
+          fi
+          git commit -m "chore: sync writeups and HackerOne stats"
+          git push

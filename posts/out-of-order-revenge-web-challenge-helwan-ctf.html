@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Out Of Order —Revenge ] WEB challenge — Helwan CTF — 0xSponge</title>
+    <meta name="description" content="[Out Of Order —Revenge ] WEB challenge — Helwan CTF Hi — I’m Adham (aka 0xSponge ). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web">
+    <meta name="author" content="Adham Khairy">
+    <link rel="canonical" href="https://0xsponge.medium.com/out-of-order-revenge-web-challenge-helwan-ctf-fbd768c089ed">
+    <meta property="og:title" content="[Out Of Order —Revenge ] WEB challenge — Helwan CTF">
+    <meta property="og:description" content="[Out Of Order —Revenge ] WEB challenge — Helwan CTF Hi — I’m Adham (aka 0xSponge ). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://0xsponge.me/posts/out-of-order-revenge-web-challenge-helwan-ctf.html">
+    <meta property="article:published_time" content="2025-09-18">
+    <meta property="og:image" content="https://cdn-images-1.medium.com/max/1024/1*HRxA5uclaiQTOQO54ZtQCA.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧽</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="../index.html">0x<span>Sponge</span></a>
+        <nav class="nav">
+            <a href="../index.html">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../blog.html" class="active">Blog</a>
+            <a href="../contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-link" href="../blog.html">← All writeups</a>
+
+        <article class="post">
+            <h1 class="post-title">[Out Of Order —Revenge ] WEB challenge — Helwan CTF</h1>
+            <div class="post-meta">
+                <span>Sep 18, 2025</span>
+                <span>·</span>
+                <span>1 min read</span>
+                <div class="blog-tags"><span class="blog-tag">web-development</span><span class="blog-tag">sql</span><span class="blog-tag">ctf</span></div>
+            </div>
+
+            <div class="post-body">
+<h3>[Out Of Order —Revenge ] WEB challenge — Helwan CTF</h3><p>Hi — I’m Adham (aka <strong>0xSponge</strong>). My team ( أدهم عايز يتجوز ) placed <strong>4th</strong> in the Helwan CTF; I solved <strong>three web challenges</strong> solo. This writeup covers the first two, with clear recon, exploit POCs, and the final flags.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*HRxA5uclaiQTOQO54ZtQCA.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/1024/1*1mgP25QQXSYudcdrVu2J8g.png"></figure><p>The first challenge, <strong>Out Of Order</strong>, is a web app with login and signup functionality. While inspecting the source code I discovered that the username field is vulnerable to SQL injection — below I'll show the vulnerable code and the tests I ran.</p><pre>define('SAFE_MODE', false);<br><br>try {<br>      if (SAFE_MODE) {<br>        $stmt = db()-&gt;prepare('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)');<br>        $stmt-&gt;execute([$username, $email, $hash]);<br>      } else {<br>        $sql = "INSERT INTO users (username, email, password_hash) <br>                VALUES ('$username', CAST('$email' AS CHAR), '$hash')";<br>        db()-&gt;exec($sql);<br>      }</pre><figure><img src="https://cdn-images-1.medium.com/max/435/1*m8l6lyYzSdUltW_k5QfgOA.png"></figure><p>I tried inserting a single quote (') to break the SQL query.</p><figure><img src="https://cdn-images-1.medium.com/max/435/1*U2diIeXs9c26NTKr4GCfHA.png"></figure><p>An error was returned, confirming the parameter is vulnerable — next I’ll show how to retrieve the flag.</p><p>I tested a bunch of payloads; the successful one was ('|| any_query ||').</p><figure><img src="https://cdn-images-1.medium.com/max/416/1*y4fXz9xfA5I6WSsKdbeV5A.png"></figure><p>Next, I inspected docker-compose.yml to locate the flag.</p><figure><img src="https://cdn-images-1.medium.com/max/780/1*JhQ7h42fP0kU9y08nxYAIg.png"></figure><p>The flag is mounted as ./flag.txt:/var/lib/mysql-files/flag.txt.</p><p>Now let’s retrieve the flag!</p><figure><img src="https://cdn-images-1.medium.com/max/949/1*Ij9ZK4u5Hg5WxVkx6KxZtg.png"></figure><p>We got the flag — nice. Now onto <strong>Out Of Order Revenge</strong> and how I approached it.</p><p>Nothing major was different besides a stricter password policy. The authors had added it to detect cheating, and unfortunately they discovered that many participants had cheated.</p><p>In the end, both <em>Out Of Order</em> and <em>Revenge</em> fell, and with them the flags. It was a fun ride, a lot of trial and error, and a great reminder that sometimes the smallest details make the biggest difference. 4th place this time — but next time, aiming for the top!</p><img src="https://medium.com/_/stat?event=post.clientViewed&amp;referrerSource=full_rss&amp;postId=fbd768c089ed" loading="lazy">
+            </div>
+
+            <p class="post-origin">
+                Originally published on
+                <a href="https://0xsponge.medium.com/out-of-order-revenge-web-challenge-helwan-ctf-fbd768c089ed" target="_blank" rel="noopener">Medium ↗</a>
+            </p>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
+        </div>
+        <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+</html>

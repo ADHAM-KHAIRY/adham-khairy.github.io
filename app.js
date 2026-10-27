@@ -95,9 +95,47 @@
         })();
     }
 
+    /* ---- HackerOne badge ------------------------------------- */
+    /* HackerOne has no embeddable badge, so the figures are snapshotted
+       into data/hackerone.json by CI and rendered here. */
+    function initHackerOneBadge() {
+        const el = document.getElementById('h1-badge');
+        if (!el) return;
+
+        fetch('data/hackerone.json', { cache: 'no-cache' })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (d) {
+                const figs = [
+                    ['rep', d.reputation],
+                    ['rank', d.rank ? '#' + d.rank : null],
+                    ['signal', d.signal],
+                    ['impact', d.impact]
+                ].filter(function (f) { return f[1] !== null && f[1] !== undefined; });
+
+                el.href = d.profile_url || el.href;
+                el.innerHTML =
+                    (d.avatar ? '<img src="' + d.avatar + '" alt="" loading="lazy">' : '') +
+                    '<div class="who">' +
+                        '<div class="plat">HackerOne</div>' +
+                        '<div class="handle">@' + d.username + '</div>' +
+                    '</div>' +
+                    '<div class="figs">' + figs.map(function (f) {
+                        return '<div class="fig"><b>' + f[1] + '</b><span>' + f[0] + '</span></div>';
+                    }).join('') + '</div>';
+                el.hidden = false;
+            })
+            .catch(function (err) {
+                console.warn('[h1-badge] unavailable:', err);
+            });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initTyping();
         initObservers();
         initConsole();
+        initHackerOneBadge();
     });
 })();

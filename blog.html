@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog — CTF Writeups & Security Research | 0xSponge</title>
-    <meta name="description" content="CTF writeups and offensive security research by Adham Khairy (0xSponge), pulled live from Medium.">
+    <meta name="description" content="CTF writeups and offensive security research by Adham Khairy (0xSponge).">
     <meta name="author" content="Adham Khairy">
     <meta property="og:title" content="Blog — 0xSponge">
     <meta property="og:description" content="CTF writeups and offensive security research.">
@@ -33,7 +33,7 @@
 
         <section class="section">
             <div class="section-head"><span class="idx">//</span><h2>Writeups &amp; Research</h2></div>
-            <p class="page-intro">CTF writeups and offensive security notes, pulled live from Medium.</p>
+            <p class="page-intro">CTF writeups and offensive security notes — full articles hosted here, mirrored from Medium.</p>
 
             <div class="blog-grid" id="blog-grid">
                 <div class="skeleton-card">
@@ -61,8 +61,6 @@
     <footer class="site-footer">
         <div class="socials">
             <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
-            <a href="https://tryhackme.com/p/0xAdham" target="_blank" rel="noopener" aria-label="TryHackMe profile">TryHackMe</a>
-            <a href="https://app.hackthebox.com/users/2482072" target="_blank" rel="noopener" aria-label="Hack The Box profile">HackTheBox</a>
             <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
         </div>
         <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
@@ -70,45 +68,12 @@
 
 <script>
     /**
-     * Fetches the Medium RSS feed through a chain of CORS proxies.
-     * Tries live-feed proxies first; rss2json is last because its free
-     * tier serves a cached feed that can lag behind by hours.
+     * Posts are mirrored into posts/ at build time (scripts/build_blog.py, run
+     * daily by CI), so this is a same-origin JSON read — no CORS proxies, no
+     * waiting on Medium. index.json is metadata only; each card links to the
+     * full writeup hosted here.
      */
-    const MEDIUM_FEED_URL = 'https://0xsponge.medium.com/feed';
-
-    const RSS2JSON_API   = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
-    const ALLORIGINS_GET = `https://api.allorigins.win/get?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
-    const ALLORIGINS_RAW = `https://api.allorigins.win/raw?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
-    const CORSPROXY_API  = `https://corsproxy.io/?url=${encodeURIComponent(MEDIUM_FEED_URL)}`;
-
     const grid = document.getElementById('blog-grid');
-
-    const bust = () => `&_=${Date.now()}`;
-
-    function stripHtml(html) {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || '';
-    }
-
-    function extractImage(html) {
-        const match = String(html || '').match(/<img[^>]+src=["']([^"']+)["']/i);
-        return match ? match[1] : null;
-    }
-
-    function cleanLink(url) {
-        return String(url || '#').split('?')[0];
-    }
-
-    function formatDate(dateStr) {
-        try {
-            return new Date(dateStr).toLocaleDateString('en-US', {
-                year: 'numeric', month: 'short', day: 'numeric'
-            });
-        } catch {
-            return dateStr;
-        }
-    }
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, c => ({
@@ -117,42 +82,23 @@
     }
 
     function renderPosts(posts) {
-        if (!posts || posts.length === 0) {
-            showError('No posts found. Check back later!');
+        if (!posts.length) {
+            showError('No posts yet. Check back later!');
             return;
         }
 
-        grid.innerHTML = '';
-
-        posts.forEach(post => {
-            const title       = escapeHtml(post.title || 'Untitled');
-            const link        = cleanLink(post.link || post.url);
-            const pubDate     = formatDate(post.pubDate || post.published);
-            const rawContent  = post.content || post.description || '';
-            const description = escapeHtml(stripHtml(rawContent).slice(0, 200).trim()) + '…';
-            const thumbnail   = post.thumbnail || extractImage(rawContent) || null;
-            const tags        = (post.categories || []).slice(0, 3);
-
-            const card = document.createElement('a');
-            card.href      = link;
-            card.target    = '_blank';
-            card.rel       = 'noopener noreferrer';
-            card.className = 'blog-link';
-
-            card.innerHTML = `
+        grid.innerHTML = posts.map(post => `
+            <a class="blog-link" href="${escapeHtml(post.url)}">
                 <div class="blog-card">
-                    ${thumbnail ? `<img class="blog-card-thumbnail" src="${escapeHtml(thumbnail)}" alt="${title}" loading="lazy" onerror="this.style.display='none'">` : ''}
-                    <h3 class="blog-title">${title}</h3>
-                    <p class="blog-description">${description}</p>
+                    ${post.thumbnail ? `<img class="blog-card-thumbnail" src="${escapeHtml(post.thumbnail)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+                    <h3 class="blog-title">${escapeHtml(post.title)}</h3>
+                    <p class="blog-description">${escapeHtml(post.excerpt)}</p>
                     <div class="blog-meta">
-                        <span class="blog-date">${pubDate}</span>
-                        ${tags.length ? `<div class="blog-tags">${tags.map(t => `<span class="blog-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                        <span class="blog-date">${escapeHtml(post.date_label)} · ${post.minutes} min</span>
+                        ${post.tags.length ? `<div class="blog-tags">${post.tags.map(t => `<span class="blog-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
                     </div>
                 </div>
-            `;
-
-            grid.appendChild(card);
-        });
+            </a>`).join('');
     }
 
     function showError(msg, detail) {
@@ -167,79 +113,13 @@
             </div>`;
     }
 
-    function parseFeedXml(xmlText) {
-        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
-        if (xml.querySelector('parsererror')) throw new Error('feed XML parse error');
-
-        const items = [...xml.querySelectorAll('item')];
-        if (!items.length) throw new Error('no items in feed');
-
-        return items.map(item => {
-            const body = item.getElementsByTagName('content:encoded')[0]?.textContent
-                      || item.querySelector('description')?.textContent
-                      || '';
-            return {
-                title     : item.querySelector('title')?.textContent,
-                link      : item.querySelector('link')?.textContent
-                             || item.querySelector('guid')?.textContent,
-                pubDate   : item.querySelector('pubDate')?.textContent,
-                content   : body,
-                thumbnail : extractImage(body),
-                categories: [...item.querySelectorAll('category')].map(c => c.textContent)
-            };
-        });
-    }
-
-    async function fetchText(url) {
-        const res = await fetch(url + bust(), { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.text();
-    }
-
-    const STRATEGIES = [
-        {
-            name: 'allorigins/raw',
-            run : async () => parseFeedXml(await fetchText(ALLORIGINS_RAW))
-        },
-        {
-            name: 'allorigins/get',
-            run : async () => {
-                const data = JSON.parse(await fetchText(ALLORIGINS_GET));
-                if (!data || !data.contents) throw new Error('no contents field');
-                return parseFeedXml(data.contents);
-            }
-        },
-        {
-            name: 'corsproxy.io',
-            run : async () => parseFeedXml(await fetchText(CORSPROXY_API))
-        },
-        {
-            name: 'rss2json (may be stale)',
-            run : async () => {
-                const data = JSON.parse(await fetchText(RSS2JSON_API));
-                if (data.status !== 'ok') throw new Error(data.message || 'rss2json error');
-                return data.items;
-            }
-        }
-    ];
-
-    (async () => {
-        const failures = [];
-
-        for (const strategy of STRATEGIES) {
-            try {
-                const posts = await strategy.run();
-                console.info(`[blog] loaded via ${strategy.name}`);
-                renderPosts(posts);
-                return;
-            } catch (err) {
-                console.warn(`[blog] ${strategy.name} failed:`, err);
-                failures.push(`${strategy.name}: ${err.message}`);
-            }
-        }
-
-        showError('Unable to load posts automatically.', failures.join(' | '));
-    })();
+    fetch('posts/index.json', { cache: 'no-cache' })
+        .then(res => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(renderPosts)
+        .catch(err => showError('Unable to load the post index.', err.message));
 </script>
     <script src="app.js"></script>
 </body>

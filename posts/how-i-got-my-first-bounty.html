@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How I Got My First Bounty — 0xSponge</title>
+    <meta name="description" content="During extensive subdomain enumeration, I identified a subdomain inspire.example.com dedicated to collecting website design inspirations. Its core functionality">
+    <meta name="author" content="Adham Khairy">
+    <link rel="canonical" href="https://0xsponge.medium.com/how-i-got-my-first-bounty-70cd498b9fc5">
+    <meta property="og:title" content="How I Got My First Bounty">
+    <meta property="og:description" content="During extensive subdomain enumeration, I identified a subdomain inspire.example.com dedicated to collecting website design inspirations. Its core functionality">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://0xsponge.me/posts/how-i-got-my-first-bounty.html">
+    <meta property="article:published_time" content="2025-12-29">
+    <meta property="og:image" content="https://cdn-images-1.medium.com/max/280/0*EcJLSCjLC8EVz8Lt.gif">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧽</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="../index.html">0x<span>Sponge</span></a>
+        <nav class="nav">
+            <a href="../index.html">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../blog.html" class="active">Blog</a>
+            <a href="../contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-link" href="../blog.html">← All writeups</a>
+
+        <article class="post">
+            <h1 class="post-title">How I Got My First Bounty</h1>
+            <div class="post-meta">
+                <span>Dec 29, 2025</span>
+                <span>·</span>
+                <span>2 min read</span>
+                <div class="blog-tags"><span class="blog-tag">writeup</span><span class="blog-tag">bug-bounty</span><span class="blog-tag">authentication</span></div>
+            </div>
+
+            <div class="post-body">
+<figure><img src="https://cdn-images-1.medium.com/max/280/0*EcJLSCjLC8EVz8Lt.gif"></figure><p>During extensive subdomain enumeration, I identified a subdomain <strong><em>inspire.example.com </em></strong>dedicated to collecting website design inspirations. Its core functionality allows users to submit a form with their design idea and wait for an admin review and approval.</p><figure><img src="https://cdn-images-1.medium.com/max/690/1*9gBH6bmDHEEHLy_NnY0LBw.png"></figure><p>But me? I’m supposed to wait for admin approval? No, I had to bypass it.</p><figure><img src="https://cdn-images-1.medium.com/max/336/1*YBaFKEm5eFmlzzZuOiys2Q.png"></figure><p>When I examined the endpoints, I found that hitting the publish button resulted in a request to the /example/api_path/publish endpoint with the data {"id":"inspiration-post-id","status":"Denied"}</p><p>So I thought — why not just change “Denied” to “Approved” and see if the server blindly trusts it?</p><figure><img src="https://cdn-images-1.medium.com/max/336/1*W8ZSTY_wgz6AfJ_5G0nx2Q.png"></figure><p>And surprisingly, the server actually trusted my request without any checks!!!</p><p>But when I submitted the report, they closed it as “low” Their reasoning was that the admins review posts regularly and delete them roughly every 20 minutes.</p><figure><img src="https://cdn-images-1.medium.com/max/248/0*XH2QmRqjS-Kg9mkO.gif"></figure><p>So I decided I had to turn this endpoint into something more bounty-worthy and escalate the impact.</p><p>So I started digging deeper into the /example/api_path/publish endpoint. I retried the bug, and after the first request returned {"success":true,"newStatus":"Approved"}, I sent the same request again. This time, the server responded with {"success":true,"newStatus":"Unpublished"}.<br> Hmm… interesting.</p><p>So I wondered — can I change the ID to any other post and unpublish it? But there was a problem: how was I supposed to get that random ID?</p><figure><img src="https://cdn-images-1.medium.com/max/220/0*PcoGW44b4V8W6oBN.gif"></figure><p>So I took my inspiration post ID, published the post, opened its page, and checked the source code. I searched for my post ID to see if it was hardcoded, and surprisingly, I found it inside a variable called Dynamic-page-id.</p><p>I swapped my post ID with the victim’s ID in the /example/api_path/publish request, and to my surprise, the server accepted it and removed the victim’s post. I submitted the report, and I got my <strong>Bountyyy</strong>!</p><figure><img src="https://cdn-images-1.medium.com/max/498/0*JsgZ5lzwK5V6kRdS.gif"></figure><p>The objective is to interact with the site as a regular user would and learn the core functionality behind every API endpoint. You should understand what could actually impact the company — not just spraying XSS payloads everywhere.</p><p>👉 <strong>Don’t forget to follow me on </strong><a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener noreferrer"><strong>LinkedIn</strong></a> for more writeups and cybersecurity content!</p><p>👉 If you enjoyed this writeup, <strong>leave a like</strong> and <strong>follow me for more hacking content!</strong></p><img src="https://medium.com/_/stat?event=post.clientViewed&amp;referrerSource=full_rss&amp;postId=70cd498b9fc5" loading="lazy">
+            </div>
+
+            <p class="post-origin">
+                Originally published on
+                <a href="https://0xsponge.medium.com/how-i-got-my-first-bounty-70cd498b9fc5" target="_blank" rel="noopener">Medium ↗</a>
+            </p>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
+        </div>
+        <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+</html>

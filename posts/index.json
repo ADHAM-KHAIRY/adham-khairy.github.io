@@ -1,0 +1,162 @@
+[
+  {
+    "slug": "my-input-wasnt-the-payload-it-was-the-address",
+    "title": "My Input Wasn’t the Payload. It Was the Address.",
+    "medium_url": "https://infosecwriteups.com/my-input-wasnt-the-payload-it-was-the-address-caf9b8a65bf5",
+    "date": "2026-09-22",
+    "date_label": "Sep 22, 2026",
+    "tags": [
+      "cybersecurity",
+      "hackerone",
+      "bugbounty-writeup"
+    ],
+    "excerpt": "The bug class where there’s nothing to filter, because you never sent anything to filter. Every DOM XSS writeup has the same shape. Find a sink, find a source, then spend the afternoon on the part in between: what gets s…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*ia4d4carU88OoZdz5TbWXw.png",
+    "minutes": 4,
+    "url": "posts/my-input-wasnt-the-payload-it-was-the-address.html"
+  },
+  {
+    "slug": "debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits",
+    "title": "Debugging Endpoints Nobody Bothers to Test Leads to Some Crits",
+    "medium_url": "https://infosecwriteups.com/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits-579eb9fbceb7",
+    "date": "2026-09-05",
+    "date_label": "Sep 5, 2026",
+    "tags": [
+      "bug-bounty",
+      "penetration-testing",
+      "cybersecurity"
+    ],
+    "excerpt": "How Reading Two Lines in the Debugger Turned a Cookie Policy Page Into a Crit. The URL was this boring: https://app.example.com/cookie-policy/es/es A cookie policy page. With a locale in the path. That’s it. Nobody tests…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*Zz7H9xZpGerZtzmg-in3eA.png",
+    "minutes": 4,
+    "url": "posts/debugging-endpoints-nobody-bothers-to-test-leads-to-some-crits.html"
+  },
+  {
+    "slug": "how-i-got-my-highest-payout",
+    "title": "How I Got My Highest Payout",
+    "medium_url": "https://infosecwriteups.com/how-i-got-my-highest-payout-466213a1cb47",
+    "date": "2026-07-31",
+    "date_label": "Jul 31, 2026",
+    "tags": [
+      "pentesting",
+      "security",
+      "bug-bounty"
+    ],
+    "excerpt": "The Token Was Fine. That Was the Whole Problem. The target was an application portal. You register, you fill out a genuinely ENORMOUS form, and at the end it generates a PDF of everything you submitted: income figures, t…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*uK49No-B5J4jP5zxC_Z8nQ.png",
+    "minutes": 4,
+    "url": "posts/how-i-got-my-highest-payout.html"
+  },
+  {
+    "slug": "to-admin-for-a-bounty",
+    "title": "../../ to Admin for a $,$$$ Bounty",
+    "medium_url": "https://infosecwriteups.com/to-admin-for-a-bounty-b946f781607f",
+    "date": "2026-07-30",
+    "date_label": "Jul 30, 2026",
+    "tags": [
+      "pentesting",
+      "bug-bounty",
+      "hackerone"
+    ],
+    "excerpt": "How Two Dots Made Me Admin The target had two roles. Admin: settings, user management, billing, promotion. Basically the whole application. Around 150 endpoints . Viewer: read a few resources and go home. 10 endpoints .…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*34dAa8Y8ZJWC-yJbLF6Bew.png",
+    "minutes": 5,
+    "url": "posts/to-admin-for-a-bounty.html"
+  },
+  {
+    "slug": "cyctf-luxor-mobile-writeup",
+    "title": "CyCTF Luxor Mobile writeup",
+    "medium_url": "https://0xsponge.medium.com/cyctf-luxor-mobile-writeup-7c41f8766ec8",
+    "date": "2026-03-16",
+    "date_label": "Mar 16, 2026",
+    "tags": [
+      "ctf-writeup",
+      "mobile-pentesting",
+      "android-pentesting"
+    ],
+    "excerpt": "A Leaked pic of me solving the ctf In this write-up, I document my slightly sleep-deprived journey through the Mobile challenges of Luxor Cyshield CTF 2026. It covers the full process: the tools I threw at the problems,…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*Dq8ApAwr_vy8W3R_U8iV7w.png",
+    "minutes": 9,
+    "url": "posts/cyctf-luxor-mobile-writeup.html"
+  },
+  {
+    "slug": "how-i-got-my-first-bounty",
+    "title": "How I Got My First Bounty",
+    "medium_url": "https://0xsponge.medium.com/how-i-got-my-first-bounty-70cd498b9fc5",
+    "date": "2025-12-29",
+    "date_label": "Dec 29, 2025",
+    "tags": [
+      "writeup",
+      "bug-bounty",
+      "authentication"
+    ],
+    "excerpt": "During extensive subdomain enumeration, I identified a subdomain inspire.example.com dedicated to collecting website design inspirations. Its core functionality allows users to submit a form with their design idea and wa…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/280/0*EcJLSCjLC8EVz8Lt.gif",
+    "minutes": 2,
+    "url": "posts/how-i-got-my-first-bounty.html"
+  },
+  {
+    "slug": "night-at-the-museum-fahemsec",
+    "title": "Night at the Museum | Fahemsec",
+    "medium_url": "https://0xsponge.medium.com/night-at-the-museum-fahemsec-438e16dca94c",
+    "date": "2025-12-22",
+    "date_label": "Dec 22, 2025",
+    "tags": [
+      "cybersecurity",
+      "api",
+      "web-security"
+    ],
+    "excerpt": "Let’s dive straight into this cool, somewhat creative medium web challenge from FahemSec. Challenge URL: Night at the Museum [WEB] [Medium] [300 points] The application consists of basic authentication with role separati…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/480/0*O4l5GTBpOkNteeU7.gif",
+    "minutes": 5,
+    "url": "posts/night-at-the-museum-fahemsec.html"
+  },
+  {
+    "slug": "challenges-writeup-flaghunter-2-0-ctf",
+    "title": "Challenges Writeup |Flaghunter 2.0 CTF",
+    "medium_url": "https://0xsponge.medium.com/challenges-writeup-flaghunter-2-0-ctf-8bd3939a31b3",
+    "date": "2025-11-05",
+    "date_label": "Nov 5, 2025",
+    "tags": [
+      "ctf-writeup",
+      "ctf",
+      "web-security"
+    ],
+    "excerpt": "Hey folks , I’m Adham Khairy — aka 0xSponge . Over the last 48 hours I went solo into Flaghunter 2.0 CTF , hosted by Security BSides Vizag and sponsored by INE . It was an intense, all-by-myself grind across web , revers…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/835/1*zPjppMPkrNmQ5O7jY8ZqDA.png",
+    "minutes": 6,
+    "url": "posts/challenges-writeup-flaghunter-2-0-ctf.html"
+  },
+  {
+    "slug": "tob-web-challenge-helwan-ctf",
+    "title": "[Tob] WEB challenge — Helwan CTF",
+    "medium_url": "https://0xsponge.medium.com/tob-web-challenge-helwan-ctf-2609d0359784",
+    "date": "2025-09-18",
+    "date_label": "Sep 18, 2025",
+    "tags": [
+      "security",
+      "writing",
+      "ctf"
+    ],
+    "excerpt": "[Tob] WEB challenge — Helwan CTF Hi — I’m Adham (aka 0xSponge ). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web challenges solo. This writeup covers the Last one, with clear recon, exploit P…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*HRxA5uclaiQTOQO54ZtQCA.png",
+    "minutes": 2,
+    "url": "posts/tob-web-challenge-helwan-ctf.html"
+  },
+  {
+    "slug": "out-of-order-revenge-web-challenge-helwan-ctf",
+    "title": "[Out Of Order —Revenge ] WEB challenge — Helwan CTF",
+    "medium_url": "https://0xsponge.medium.com/out-of-order-revenge-web-challenge-helwan-ctf-fbd768c089ed",
+    "date": "2025-09-18",
+    "date_label": "Sep 18, 2025",
+    "tags": [
+      "web-development",
+      "sql",
+      "ctf"
+    ],
+    "excerpt": "[Out Of Order —Revenge ] WEB challenge — Helwan CTF Hi — I’m Adham (aka 0xSponge ). My team ( أدهم عايز يتجوز ) placed 4th in the Helwan CTF; I solved three web challenges solo. This writeup covers the first two, with cl…",
+    "thumbnail": "https://cdn-images-1.medium.com/max/1024/1*HRxA5uclaiQTOQO54ZtQCA.png",
+    "minutes": 1,
+    "url": "posts/out-of-order-revenge-web-challenge-helwan-ctf.html"
+  }
+]

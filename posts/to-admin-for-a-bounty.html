@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>../../ to Admin for a $,$$$ Bounty — 0xSponge</title>
+    <meta name="description" content="How Two Dots Made Me Admin The target had two roles. Admin: settings, user management, billing, promotion. Basically the whole application. Around 150 endpoints">
+    <meta name="author" content="Adham Khairy">
+    <link rel="canonical" href="https://infosecwriteups.com/to-admin-for-a-bounty-b946f781607f">
+    <meta property="og:title" content="../../ to Admin for a $,$$$ Bounty">
+    <meta property="og:description" content="How Two Dots Made Me Admin The target had two roles. Admin: settings, user management, billing, promotion. Basically the whole application. Around 150 endpoints">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://0xsponge.me/posts/to-admin-for-a-bounty.html">
+    <meta property="article:published_time" content="2026-07-30">
+    <meta property="og:image" content="https://cdn-images-1.medium.com/max/1024/1*34dAa8Y8ZJWC-yJbLF6Bew.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧽</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="../index.html">0x<span>Sponge</span></a>
+        <nav class="nav">
+            <a href="../index.html">Home</a>
+            <a href="../about.html">About</a>
+            <a href="../blog.html" class="active">Blog</a>
+            <a href="../contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-link" href="../blog.html">← All writeups</a>
+
+        <article class="post">
+            <h1 class="post-title">../../ to Admin for a $,$$$ Bounty</h1>
+            <div class="post-meta">
+                <span>Jul 30, 2026</span>
+                <span>·</span>
+                <span>5 min read</span>
+                <div class="blog-tags"><span class="blog-tag">pentesting</span><span class="blog-tag">bug-bounty</span><span class="blog-tag">hackerone</span></div>
+            </div>
+
+            <div class="post-body">
+<figure><img src="https://cdn-images-1.medium.com/max/1024/1*34dAa8Y8ZJWC-yJbLF6Bew.png"><figcaption>How Two Dots Made Me Admin</figcaption></figure><p>The target had two roles.</p><p><strong>Admin: </strong>settings, user management, billing, promotion. Basically the whole application. Around <strong>150 endpoints</strong>.</p><p><strong>Viewer: </strong>read a few resources and go home. <strong>10 endpoints</strong>. Guess which one my account was.</p><p>140 endpoints I wasn’t allowed to touch. That gap is not a limitation, that’s a to-do list.</p><h3>The boring part nobody posts about</h3><p>So here’s what I actually did, and I want to be honest because most writeups skip this bit and jump straight to the clever payload.</p><p>I created an admin account on the second tenant, clicked through every single feature, and logged every request Burp saw. Then I took my <strong>viewer</strong> session cookie, dropped it into all 150 of those requests, and replayed them one by one.</p><p>That’s it. No custom tooling, no 12-stage recon pipeline. Just a viewer cookie and a lot of right-clicking.</p><figure><img src="https://cdn-images-1.medium.com/max/787/1*QlQ3R59d0S5Jz9QmRuM_7Q.png"><figcaption>I know i should rename the tabs, focus on the finding mate</figcaption></figure><p>149 of them came back with the same thing:</p><pre>HTTP/1.1 403 Forbidden<br>.........<br>.........<br>.........<br>.........<br><br><br>{"error":"Insufficient permissions"}</pre><p>Over and over and over. At some point you stop reading the responses and start pattern-matching on the color of the status code column. Which is exactly when you miss things, so I made myself slow down and actually look at each one.</p><p>Good thing I did, because number 137 was green.</p><h3>Step 0: the one that answered</h3><pre>POST /api/admin/action HTTP/1.1<br>Host: app.example.com<br>Cookie: session=&lt;viewer_session&gt;<br>Content-Type: application/x-www-form-urlencoded<br><br><br>Action=ViewSettings</pre><pre>HTTP/1.1 200 OK<br>.......<br>.......<br>.......<br><br><br>{"success":true,"settings":{...}}</pre><p>A viewer just read the repository settings.</p><p>That’s already a report. Broken access control, admin functionality reachable by a read-only role, write it up and get a $500 medium bug and move on.</p><p>But something about it bothered me.</p><p>Look at the request again. There’s no resource id, no object reference, no query. The entire request is a <strong>VERB in a string</strong>. Action=ViewSettings. The server takes a name and… does the thing named that?</p><p>If that were a normal switch statement or an allow-list, fine, whatever. But it didn't smell like a switch. It smelled like the value was being <strong>concatenated into something</strong>.</p><p>And things that get concatenated into paths can be walked.</p><h3>Step 1: the dumbest possible test</h3><p>Before doing anything clever I wanted to know which of the two it was: allow-list or path resolution.</p><p>So I sent the most useless payload I could think of.</p><pre>POST /api/admin/action HTTP/1.1<br>Cookie: session=&lt;viewer_session&gt;<br>.......<br>.......<br>.......<br><br>Action=./ViewSettings</pre><pre>HTTP/1.1 200 OK<br>.......<br>.......<br>.......<br><br>{"success":true,"settings":{...}}</pre><h4>Still <strong>200</strong>.</h4><p>And this is the whole finding right here, in one character.</p><p>./ViewSettings is <strong>not a valid action name</strong>. If the backend were comparing my input against a list of allowed strings, this is an instant reject, it's simply not in the list. There is no world where an allow-list accepts it.</p><p>But ./ means "same directory, go nowhere." It's a no-op. To a <strong>path resolver</strong>, ./ViewSettings and ViewSettings are the same place.</p><p>The server treated them as the same place.</p><p>So it’s a path. It was never an action name, it was a path segment being glued onto some internal URL and resolved before the internal call went out.</p><h3>Step 2: walking up</h3><p>Now I’m not guessing action names anymore. I’m navigating.</p><p>If ./ resolves, ../ resolves. One level up, then back down into wherever admin lives:</p><pre>POST /api/admin/action HTTP/1.1<br>Cookie: session=&lt;viewer_session&gt;<br>..........<br>..........<br>..........<br><br><br>Action=../admin/viewsettings</pre><pre>HTTP/1.1 200 OK</pre><p>Whatever the internal base was, it collapsed to something like:</p><pre>/internal/action/../admin/viewsettings<br>        ↓<br>/internal/admin/viewsettings</pre><p>Two hundred again.</p><p>At this point I stopped caring about settings entirely. Settings were never the prize. The prize is that I’m now issuing requests to the internal API <strong>as the internal API</strong>, from a viewer session, and whatever service is on the other end has no idea a viewer is driving.</p><h3>Step 3: the one I was building toward</h3><p>Remember the admin routes I mapped in the boring phase? One of them was a promotion endpoint. Takes a user id in the path, flips that user to admin.</p><p>Two levels up to land on the API root, then straight into it:</p><pre>POST /api/admin/action HTTP/1.1<br>Host: app.example.com<br>Cookie: session=&lt;viewer_session&gt;<br>Content-Type: application/x-www-form-urlencoded<br>..........<br>..........<br>..........<br><br>Action=../../api/admin/promote/&lt;my_user_id&gt;</pre><pre>HTTP/1.1 200 OK<br>..........<br>..........<br>..........<br><br><br>{"message":"User promoted to admin successfully"}</pre><p>Refreshed the dashboard.</p><p>Adminnnnn. <strong>$X,000.</strong></p><blockquote><em>Small side note that made me laugh, I pulled almost exactly this trick a few months earlier on a challenge from </em><a href="https://fahemsec.com/" target="_blank" rel="noopener noreferrer"><strong><em>FahemSec</em></strong></a><em>, traversing a bot’s </em><em>userId parameter into </em><em>/api/admin/promote/. Shoutout to them, genuinely, their challenges aren't puzzle-box nonsense, they're built out of the stuff real applications actually get wrong. I remember thinking at the time that nobody would ever ship that. Then somebody shipped that.</em></blockquote><h3>Why it actually worked</h3><p>Two separate mistakes, and you need <strong>both</strong> of them.</p><p><strong>The Action value was dropped into a path with zero cleaning.</strong> No canonicalization, no stripping of ../, no allow-list check against known action names. The developer clearly assumed the value would only ever be one of the strings their own frontend sends.</p><p><strong>Internal calls were trusted by default.</strong> The public gateway enforced roles properly, that’s why 149 endpoints gave me 403. But service-to-service calls behind it skipped that check entirely, because obviously an internal caller is already authorized. So the moment I could aim an internal request, I arrived pre-authenticated as nobody in particular, which the backend read as “trusted.”</p><p>Either one alone is survivable. Traversal into a service that still checks roles gets you nothing. A trusted internal mesh with no user-controlled routing into it gets you nothing. Put them together and a read-only account writes itself an admin role.</p><h3>What I’d tell you to take from this</h3><p>The clever part of this bug was one character long. .</p><p>The part that actually found it was replaying 150 requests with the wrong cookie and not zoning out on request 118.</p><p>And when that first endpoint answered, the report was already there, a viewer reading admin settings is valid on its own. The $X,000 came from asking one extra question about <em>why</em> it answered instead of screenshotting the 200 and hitting submit. Same instinct as my first bounty, where a “Medium” turned into a real payout only after I went back and pushed on the endpoint again.</p><p>Don’t stop at the first 200. The 200 is the door, not the room.</p><p>👉 <strong>Don’t forget to follow me on</strong> <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener noreferrer"><strong>LinkedIn</strong></a> for more writeups and cybersecurity content!</p><p>👉 If you enjoyed this writeup, <strong>leave a like</strong> and <strong>follow me for more hacking content!</strong></p><img src="https://medium.com/_/stat?event=post.clientViewed&amp;referrerSource=full_rss&amp;postId=b946f781607f" loading="lazy"><hr><p><a href="https://infosecwriteups.com/to-admin-for-a-bounty-b946f781607f" target="_blank" rel="noopener noreferrer">../../ to Admin for a $,$$$ Bounty</a> was originally published in <a href="https://infosecwriteups.com" target="_blank" rel="noopener noreferrer">InfoSec Write-ups</a> on Medium, where people are continuing the conversation by highlighting and responding to this story.</p>
+            </div>
+
+            <p class="post-origin">
+                Originally published on
+                <a href="https://infosecwriteups.com/to-admin-for-a-bounty-b946f781607f" target="_blank" rel="noopener">Medium ↗</a>
+            </p>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="socials">
+            <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener" aria-label="LinkedIn profile">LinkedIn</a>
+            <a href="https://hackerone.com/0xadham?type=user" target="_blank" rel="noopener" aria-label="HackerOne profile">HackerOne</a>
+        </div>
+        <p>© 2026 Adham Khairy (0xSponge) · All rights reserved</p>
+    </footer>
+
+    <script src="../app.js"></script>
+</body>
+</html>
