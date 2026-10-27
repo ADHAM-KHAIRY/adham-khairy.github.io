@@ -118,13 +118,144 @@ def escape(s, quotes=True):
     return s.replace('"', '&quot;').replace("'", '&#39;') if quotes else s
 
 
+# ---------------------------------------------------------------------------
+# Code blocks
+#
+# Medium ships <pre> as undifferentiated text. These blocks are the substance
+# of a writeup, so they get an editor frame and are highlighted here rather
+# than by a CDN highlighter at runtime: the pages stay static, and a payload is
+# never re-parsed in the reader's browser. Every token is escaped on the way
+# out, so the rendered text is byte-identical to the source.
+# ---------------------------------------------------------------------------
+
+KEYWORDS = {
+    'javascript': ('const let var function return if else for while new await async await class '
+                   'this typeof null undefined true false throw try catch import export default'),
+    'python': ('def class return if elif else for while import from as with try except raise '
+               'lambda None True False and or not in is pass yield global'),
+    'bash': ('sudo curl wget cat grep awk sed echo chmod chown cd ls rm cp mv export set '
+             'nmap ffuf gobuster nc ssh python3 git docker if then fi for do done'),
+    'http': 'GET POST PUT PATCH DELETE HEAD OPTIONS TRACE CONNECT HTTP',
+    'json': 'true false null',
+    'sql': ('select from where union all order by group insert update delete drop table '
+            'and or not like limit offset join on as'),
+    'php': ('function return if else elseif foreach for while echo print new class public '
+            'private protected static try catch throw require include define true false null'),
+    'text': '',
+    'html': '',
+}
+
+LANG_LABEL = {
+    'javascript': 'javascript', 'python': 'python', 'bash': 'shell', 'http': 'http',
+    'json': 'json', 'sql': 'sql', 'php': 'php', 'html': 'html', 'text': 'text',
+}
+
+
+def detect_lang(code):
+    head = code.lstrip()
+    first = head.split('\n', 1)[0]
+
+    if re.match(r'^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\S+|^HTTP/\d', first):
+        return 'http'
+    if re.match(r'^[\[{]', head) and re.search(r'"\s*:', head):
+        return 'json'
+    if re.search(r'<\?php|\$\w+\s*=|->\w+\(|\becho\s', head):
+        return 'php'
+    if re.search(r'\b(SELECT|UNION\s+SELECT|INSERT\s+INTO|DROP\s+TABLE)\b', head, re.I):
+        return 'sql'
+    if re.search(r'\b(const|let|var|function|=>|document\.|window\.|console\.)', head):
+        return 'javascript'
+    if re.search(r'^\s*(def|class|import|from)\s|\bprint\(', head, re.M):
+        return 'python'
+    if re.match(r'^[$#]\s|\b(curl|sudo|nmap|ffuf|gobuster|chmod|wget|grep)\b', head):
+        return 'bash'
+    if re.match(r'^\s*<[a-zA-Z/!]', head):
+        return 'html'
+    return 'text'
+
+
+def highlight(code, lang):
+    """Single-pass tokenizer. Anything unmatched is emitted as escaped text,
+    so no input can be dropped or reordered."""
+    words = KEYWORDS.get(lang, '').split()
+    rules = []
+
+    # one comment rule per language — PHP takes both styles
+    comment = []
+    if lang in ('bash', 'python', 'php'):
+        comment.append(r'^[ \t]*#[^\n]*')
+    if lang in ('javascript', 'sql', 'php'):
+        comment.append(r'(?<!:)//[^\n]*|/\*.*?\*/')
+    if comment:
+        rules.append(('cm', '|'.join(comment)))
+    if lang == 'http':
+        # header names, before anything else can claim the colon
+        rules.append(('at', r'^[A-Za-z][A-Za-z-]*(?=:\s)'))
+
+    rules += [
+        ('st', r'"(?:[^"\\\n]|\\.)*"' + r"|'(?:[^'\\\n]|\\.)*'"),
+        ('ur', r'https?://[^\s"\'<>()]+'),
+        ('nu', r'\b\d+(?:\.\d+)?\b'),
+    ]
+    if words:
+        rules.append(('kw', r'\b(?:%s)\b' % '|'.join(re.escape(w) for w in words)))
+    rules += [
+        ('fn', r'\b[A-Za-z_]\w*(?=\()'),
+        ('op', r'[=<>!+\-*/%&|^~?:;,.(){}\[\]]'),
+    ]
+
+    scanner = re.compile('|'.join('(?P<%s>%s)' % r for r in rules), re.S | re.M)
+
+    out, pos = [], 0
+    for m in scanner.finditer(code):
+        if m.start() > pos:
+            out.append(escape(code[pos:m.start()], quotes=False))
+        out.append('<span class="t-%s">%s</span>' % (m.lastgroup, escape(m.group(), quotes=False)))
+        pos = m.end()
+    out.append(escape(code[pos:], quotes=False))
+    return ''.join(out)
+
+
+def unescape(s):
+    return (s.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"')
+             .replace('&#39;', "'").replace('&nbsp;', ' ').replace('&amp;', '&'))
+
+
+PRE_RE = re.compile(r'<pre>(.*?)</pre>', re.S)
+
+
+def decorate_code(html):
+    """Wrap every <pre> in an editor frame and highlight its contents."""
+
+    def one(m):
+        inner = m.group(1)
+        # a block carrying its own markup is framed but left untouched
+        if re.search(r'<(?!br\s*/?>)[a-zA-Z]', inner):
+            body, lang = inner, 'text'
+        else:
+            code = unescape(re.sub(r'<br\s*/?>', '\n', inner))
+            lang = detect_lang(code)
+            body = highlight(code, lang)
+
+        return (
+            '<div class="code-block" data-lang="%s">'
+            '<div class="code-bar"><span class="dots"></span>'
+            '<span class="code-lang">%s</span>'
+            '<button class="code-copy" type="button">copy</button></div>'
+            '<pre>%s</pre></div>'
+        ) % (lang, LANG_LABEL.get(lang, lang), body)
+
+    return PRE_RE.sub(one, html)
+
+
 def sanitize(html):
     p = Sanitizer()
     p.feed(html or '')
     p.close()
     out = MEDIUM_FOOTER.sub('', p.result())
     # the pixel usually sat inside its own <figure>, now empty
-    return re.sub(r'<figure>\s*</figure>', '', out).strip()
+    out = re.sub(r'<figure>\s*</figure>', '', out).strip()
+    return decorate_code(out)
 
 
 def strip_tags(html):

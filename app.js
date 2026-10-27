@@ -95,6 +95,40 @@
         })();
     }
 
+    /* ---- Copy button on code blocks -------------------------- */
+    function initCodeCopy() {
+        document.querySelectorAll('.code-copy').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const pre = btn.closest('.code-block').querySelector('pre');
+                if (!pre) return;
+
+                const done = function () {
+                    btn.textContent = 'copied';
+                    btn.classList.add('done');
+                    setTimeout(function () {
+                        btn.textContent = 'copy';
+                        btn.classList.remove('done');
+                    }, 1600);
+                };
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(pre.innerText).then(done, function () {
+                        btn.textContent = 'failed';
+                    });
+                    return;
+                }
+                // older browsers, and any page not served over https
+                const sel = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(pre);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = 'failed'; }
+                sel.removeAllRanges();
+            });
+        });
+    }
+
     /* ---- HackerOne badge ------------------------------------- */
     /* HackerOne has no embeddable badge, so the figures are snapshotted
        into data/hackerone.json by CI and rendered here. */
@@ -137,5 +171,6 @@
         initObservers();
         initConsole();
         initHackerOneBadge();
+        initCodeCopy();
     });
 })();

@@ -473,20 +473,84 @@ a.cert:hover .ic { background: rgba(255, 210, 63, 0.2); }
 .post-body li { margin-bottom: 7px; }
 .post-body hr { border: none; border-top: 1px solid var(--border); margin: 30px 0; }
 
-.post-body pre {
+/* code blocks wear an editor frame; tokens are coloured at build time
+   (scripts/build_blog.py), so nothing is re-parsed in the browser */
+.code-block {
+    margin: 0 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1e1e1e;
+    box-shadow: 0 16px 42px -22px rgba(0, 0, 0, 0.9);
+}
+.code-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #323233;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+}
+.code-bar .dots { display: flex; gap: 6px; flex-shrink: 0; }
+.code-bar .dots::before,
+.code-bar .dots::after,
+.code-bar .dots > i {
+    content: '';
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    display: block;
+}
+.code-bar .dots::before { background: #ff5f57; box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840; }
+.code-bar .dots::after { display: none; }
+.code-bar .dots { width: 47px; }
+
+.code-lang {
+    flex-grow: 1;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9aa2ad;
+}
+.code-copy {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #9aa2ad;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+.code-copy:hover { color: var(--accent); border-color: var(--border-2); }
+.code-copy.done { color: #28c840; border-color: rgba(40, 200, 64, 0.5); }
+
+.code-block pre {
     font-family: var(--mono);
     font-size: 0.82rem;
-    line-height: 1.6;
-    background: rgba(2, 8, 15, 0.72);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin: 0 0 17px;
+    line-height: 1.65;
+    background: #1e1e1e;
+    margin: 0;
+    padding: 15px 17px;
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-word;
-    color: #e6ebf3;
+    color: #d4d4d4;
+    tab-size: 4;
 }
+
+/* VS Code Dark+ token palette */
+.t-cm { color: #6a9955; font-style: italic; }   /* comment */
+.t-st { color: #ce9178; }                       /* string  */
+.t-ur { color: #ce9178; text-decoration: underline dotted rgba(206, 145, 120, 0.4); }
+.t-nu { color: #b5cea8; }                       /* number  */
+.t-kw { color: #569cd6; }                       /* keyword */
+.t-fn { color: #dcdcaa; }                       /* call    */
+.t-at { color: #9cdcfe; }                       /* header  */
+.t-op { color: #c8c8c8; }                       /* operator*/
 .post-body code { font-family: var(--mono); font-size: 0.86em; }
 .post-body p > code {
     background: rgba(2, 8, 15, 0.6);
@@ -502,8 +566,15 @@ a.cert:hover .ic { background: rgba(255, 210, 63, 0.2); }
 }
 .post-body blockquote p:last-child { margin-bottom: 0; }
 
-.post-body figure { margin: 0 0 20px; }
-.post-body img { max-width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--border); }
+.post-body figure { margin: 0 0 22px; text-align: center; }
+.post-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
 .post-body figcaption { font-size: 0.78rem; color: var(--faint); text-align: center; margin-top: 8px; }
 
 .post-body table { width: 100%; border-collapse: collapse; margin: 0 0 17px; font-size: 0.88rem; }
@@ -622,6 +693,7 @@ a.cert:hover .ic { background: rgba(255, 210, 63, 0.2); }
     .tl-top { flex-direction: column; }
     .post { padding: 20px 17px; }
     .post-title { font-size: 1.45rem; }
+    .code-block pre { font-size: 0.76rem; padding: 12px 13px; }
     .h1-badge { flex-wrap: wrap; justify-content: center; text-align: center; }
     .h1-badge .who { flex-basis: 100%; text-align: center; }
     body { background-attachment: scroll; }

@@ -44,7 +44,195 @@
             </div>
 
             <div class="post-body">
-<p>Let’s dive straight into this cool, somewhat creative medium web challenge from FahemSec.</p><p>Challenge URL: <a href="https://fahemsec.com/challenge?id=36" target="_blank" rel="noopener noreferrer">Night at the Museum</a> [WEB] [Medium] [300 points]</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*O4l5GTBpOkNteeU7.gif"></figure><p>The application consists of basic authentication with role separation between users and admins. Users can purchase tickets for six rooms, while access to the seventh room — where the flag is located — is limited to admins. There is also a QR submission feature where user-generated ticket QRs are processed by an automated admin bot to validate and mark the user as a visitor.</p><p>Taking a look at the source code and file tree, there are around 89 files — yeah, that’s a lot, but we’ll get through it.</p><pre>.<br>├── backend<br>│   ├── Dockerfile<br>│   ├── package.json<br>│   ├── package-lock.json<br>│   ├── server.js<br>│   ├── src<br>│   │   ├── config<br>│   │   │   └── index.js<br>│   │   ├── controllers<br>│   │   │   ├── admin.controller.js<br>│   │   │   ├── auth.controller.js<br>│   │   │   ├── qrcode.controller.js<br>│   │   │   ├── rooms.controller.js<br>│   │   │   ├── tickets.controller.js<br>│   │   │   └── user.controller.js<br>│   │   ├── database.js<br>│   │   ├── index.js<br>│   │   ├── middleware<br>│   │   │   ├── auth.middleware.js<br>│   │   │   └── errorHandler.js<br>│   │   ├── routes<br>│   │   │   ├── admin.router.js<br>│   │   │   ├── auth.router.js<br>│   │   │   ├── qrcode.router.js<br>│   │   │   ├── rooms.router.js<br>│   │   │   └── tickets.router.js<br>│   │   ├── services<br>│   │   │   ├── auth.service.js<br>│   │   │   ├── database.service.js<br>│   │   │   ├── qrcode.service.js<br>│   │   │   ├── room.service.js<br>│   │   │   └── user.service.js<br>│   │   └── utils<br>│   │       ├── apiError.js<br>│   │       ├── catchAsync.js<br>│   │       └── wrapAsync.js<br>│   └── utils<br>│       └── apiError.js<br>├── bot<br>│   ├── Dockerfile<br>│   ├── package.json<br>│   ├── package-lock.json<br>│   ├── public<br>│   │   ├── css<br>│   │   │   └── pharaonic.css<br>│   │   └── js<br>│   ├── server.js<br>│   └── views<br>│       ├── 404.ejs<br>│       └── index.ejs<br>├── docker-compose.yml<br>├── frontend<br>│   ├── angular.json<br>│   ├── Dockerfile<br>│   ├── nginx.conf<br>│   ├── package.json<br>│   ├── package-lock.json<br>│   ├── public<br>│   │   └── favicon.ico<br>│   ├── src<br>│   │   ├── app<br>│   │   │   ├── admin<br>│   │   │   │   └── check<br>│   │   │   │       ├── check.component.css<br>│   │   │   │       ├── check.component.html<br>│   │   │   │       └── check.component.ts<br>│   │   │   ├── app.config.ts<br>│   │   │   ├── app.css<br>│   │   │   ├── app.html<br>│   │   │   ├── app.routes.ts<br>│   │   │   ├── app.spec.ts<br>│   │   │   ├── app.ts<br>│   │   │   ├── auth-redirect<br>│   │   │   │   ├── auth-redirect.component.css<br>│   │   │   │   ├── auth-redirect.component.html<br>│   │   │   │   └── auth-redirect.component.ts<br>│   │   │   ├── dashboard<br>│   │   │   │   ├── dashboard.css<br>│   │   │   │   ├── dashboard.html<br>│   │   │   │   └── dashboard.ts<br>│   │   │   ├── guards<br>│   │   │   │   └── admin.guard.ts<br>│   │   │   ├── interceptors<br>│   │   │   │   └── auth.interceptor.ts<br>│   │   │   ├── login<br>│   │   │   │   ├── login.css<br>│   │   │   │   ├── login.html<br>│   │   │   │   ├── login.spec.ts<br>│   │   │   │   └── login.ts<br>│   │   │   ├── register<br>│   │   │   │   ├── register.css<br>│   │   │   │   ├── register.html<br>│   │   │   │   ├── register.spec.ts<br>│   │   │   │   └── register.ts<br>│   │   │   ├── room-entry<br>│   │   │   │   ├── room-entry.css<br>│   │   │   │   ├── room-entry.html<br>│   │   │   │   └── room-entry.ts<br>│   │   │   ├── services<br>│   │   │   │   ├── admin.service.ts<br>│   │   │   │   ├── auth.service.ts<br>│   │   │   │   ├── http.service.ts<br>│   │   │   │   ├── qrcode.service.ts<br>│   │   │   │   └── room.service.ts<br>│   │   │   ├── toast.component.css<br>│   │   │   ├── toast.component.ts<br>│   │   │   └── toast.service.ts<br>│   │   ├── environments<br>│   │   │   ├── environment.prod.ts<br>│   │   │   └── environment.ts<br>│   │   ├── index.html<br>│   │   ├── main.ts<br>│   │   └── styles.css<br>│   ├── tsconfig.app.json<br>│   ├── tsconfig.json<br>│   └── tsconfig.spec.json<br>├── package.json<br>└── package-lock.json</pre><p>First, inspecting the QR code generated for a normal user shows that it contains three main fields in JSON format: userId, roomId, and username.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*R5FsaEp1G3G3v6RuAlbHrw.png"></figure><p>Next, let’s take a closer look at what the admin bot does when it scans the QR code.</p><pre>  try {<br>    if (typeof browser.createIncognitoBrowserContext === 'function') {<br>      context = await browser.createIncognitoBrowserContext();<br>      page = await context.newPage();<br>    } else {<br>      page = await browser.newPage();<br>      context = page.browserContext ? page.browserContext() : null;<br>    }<br><br>    await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/115.0.0.0 Safari/537.36');<br><br>    page.on('console', m =&gt; console.log('PAGE LOG&gt;', m.text()));<br>    page.on('request', r =&gt; console.log('PAGE REQ&gt;', r.method(), r.url()));<br>    page.on('response', r =&gt; console.log('PAGE RES&gt;', r.status(), r.url()));<br><br>    const origin = FRONTEND_URL.replace(/\/\/+$/, '');<br>    console.log('Bot going to frontend origin:', origin);<br><br>    await page.goto(origin, { waitUntil: 'networkidle2', timeout: 30000 });<br>    <br>    await page.evaluate((t, u) =&gt; { <br>      localStorage.setItem('pharaonic_token', t); <br>      localStorage.setItem('pharaonic_user', JSON.stringify(u)); <br>    }, token, user);<br><br>    const target = `${origin}/admin/check?userId=${userId}`;<br>    console.log('Bot navigating to:', target);<br><br>    try {<br>      await page.goto(target, { waitUntil: 'networkidle2', timeout: 30000 });<br>      <br>    } catch (e) {<br>      console.warn('page.goto failed:', e &amp;&amp; e.message);<br>    }<br><br><br>  } finally {<br>    try { if (page &amp;&amp; !page.isClosed &amp;&amp; typeof page.close === 'function') await page.close(); } catch (e) { }<br>    try { if (context &amp;&amp; typeof context.close === 'function') await context.close(); } catch (e) { }<br>    try { if (browser &amp;&amp; typeof browser.close === 'function') await browser.close(); } catch (e) { }<br>  }</pre><p>The bot’s primary role is to authenticate as an admin, scan the QR code, <strong>blindly</strong> extract the id parameter, and use it directly in the /admin/check?userId= endpoint. With that in mind, we can move on to reviewing the admin functions.</p><pre>const express = require('express');<br>const router = express.Router();<br>const adminController = require('../controllers/admin.controller');<br>const wrapAsync = require('../utils/wrapAsync');<br><br>router.get('/users/:id', wrapAsync(adminController.getUserById));<br><br>router.get('/promote/:id', wrapAsync(adminController.promoteToAdmin));<br><br>router.post('/rooms', wrapAsync(adminController.createRoom));<br><br>module.exports = router;</pre><pre>promoteUserToAdmin: (userId, callback) =&gt; {<br>    db.run(<br>      'UPDATE users SET is_admin = 1 WHERE id = ?',<br>      [userId],<br>      callback<br>    );<br>  }</pre><pre>async promoteToAdmin(req, res, next) {<br>    try {<br>      if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });<br>      const userId = req.params?.id;<br>      console.log("[+] Promote to admin userId:", userId);<br>      if (!userId) return res.status(400).json({ error: 'User ID is required' });<br>      dbHelper.promoteUserToAdmin(userId, (err) =&gt; {<br>        if (err) return next(err);<br>        res.json({ message: 'User promoted to admin successfully' });<br>      });<br>    } catch (err) {<br>      next(err);<br>    }<br>  }</pre><p>The admin routes expose three functions, with the most interesting one being /api/admin/promote/:id, which upgrades a normal user to an admin role.</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*PasltxVYZFQBH8r3.gif"></figure><p>At this point, if the admin bot calls /admin/check?userId= with a value like ../../../api/admin/promote/123 the endpoint /api/admin/promote/../../../api/admin/promote/123 will be called and then the backend resolves it to api/admin/promote/123. As a result, this should promote the user to admin—so let’s test it.</p><p>The next step is to take a valid QR scan JSON from a normal user, modify the id field to ../../../api/admin/promote/31, and then submit it back to the bot for scanning to see if it promotes the user to the admin role.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*4JXBwh0iNa_KYEo97qpCpQ.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/966/1*qg5q_esTx7R_qJyDCs4grA.png"></figure><p>Now let’s take a look at the main page.</p><figure><img src="https://cdn-images-1.medium.com/max/612/1*dw80KN6QuqhF3CEVnEduUQ.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/386/0*aYa31B9Sh7d6g-OA.gif"></figure><p>Yahooooooooo <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener noreferrer">0xSponge</a> is admin let’s get the flag</p><figure><img src="https://cdn-images-1.medium.com/max/675/1*_ZuTZj8QCPAZ8nrOALnYwg.png"></figure><p>In the end, this challenge highlights how blindly trusting user-controlled input — especially when it’s later reused in privileged backend logic — can completely break role separation. A simple path traversal combined with an over-trusted admin bot was enough to escalate privileges and access restricted resources. Proper input validation and strict routing controls would have prevented this entire exploit chain.</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*8_KUHrAxzZ2LK2m8.gif"></figure>
+<p>Let’s dive straight into this cool, somewhat creative medium web challenge from FahemSec.</p><p>Challenge URL: <a href="https://fahemsec.com/challenge?id=36" target="_blank" rel="noopener noreferrer">Night at the Museum</a> [WEB] [Medium] [300 points]</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*O4l5GTBpOkNteeU7.gif"></figure><p>The application consists of basic authentication with role separation between users and admins. Users can purchase tickets for six rooms, while access to the seventh room — where the flag is located — is limited to admins. There is also a QR submission feature where user-generated ticket QRs are processed by an automated admin bot to validate and mark the user as a visitor.</p><p>Taking a look at the source code and file tree, there are around 89 files — yeah, that’s a lot, but we’ll get through it.</p><div class="code-block" data-lang="text"><div class="code-bar"><span class="dots"></span><span class="code-lang">text</span><button class="code-copy" type="button">copy</button></div><pre><span class="t-op">.</span>
+├── backend
+│   ├── Dockerfile
+│   ├── package<span class="t-op">.</span>json
+│   ├── package<span class="t-op">-</span>lock<span class="t-op">.</span>json
+│   ├── server<span class="t-op">.</span>js
+│   ├── src
+│   │   ├── config
+│   │   │   └── index<span class="t-op">.</span>js
+│   │   ├── controllers
+│   │   │   ├── admin<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   │   ├── auth<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   │   ├── qrcode<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   │   ├── rooms<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   │   ├── tickets<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   │   └── user<span class="t-op">.</span>controller<span class="t-op">.</span>js
+│   │   ├── database<span class="t-op">.</span>js
+│   │   ├── index<span class="t-op">.</span>js
+│   │   ├── middleware
+│   │   │   ├── auth<span class="t-op">.</span>middleware<span class="t-op">.</span>js
+│   │   │   └── errorHandler<span class="t-op">.</span>js
+│   │   ├── routes
+│   │   │   ├── admin<span class="t-op">.</span>router<span class="t-op">.</span>js
+│   │   │   ├── auth<span class="t-op">.</span>router<span class="t-op">.</span>js
+│   │   │   ├── qrcode<span class="t-op">.</span>router<span class="t-op">.</span>js
+│   │   │   ├── rooms<span class="t-op">.</span>router<span class="t-op">.</span>js
+│   │   │   └── tickets<span class="t-op">.</span>router<span class="t-op">.</span>js
+│   │   ├── services
+│   │   │   ├── auth<span class="t-op">.</span>service<span class="t-op">.</span>js
+│   │   │   ├── database<span class="t-op">.</span>service<span class="t-op">.</span>js
+│   │   │   ├── qrcode<span class="t-op">.</span>service<span class="t-op">.</span>js
+│   │   │   ├── room<span class="t-op">.</span>service<span class="t-op">.</span>js
+│   │   │   └── user<span class="t-op">.</span>service<span class="t-op">.</span>js
+│   │   └── utils
+│   │       ├── apiError<span class="t-op">.</span>js
+│   │       ├── catchAsync<span class="t-op">.</span>js
+│   │       └── wrapAsync<span class="t-op">.</span>js
+│   └── utils
+│       └── apiError<span class="t-op">.</span>js
+├── bot
+│   ├── Dockerfile
+│   ├── package<span class="t-op">.</span>json
+│   ├── package<span class="t-op">-</span>lock<span class="t-op">.</span>json
+│   ├── public
+│   │   ├── css
+│   │   │   └── pharaonic<span class="t-op">.</span>css
+│   │   └── js
+│   ├── server<span class="t-op">.</span>js
+│   └── views
+│       ├── <span class="t-nu">404</span><span class="t-op">.</span>ejs
+│       └── index<span class="t-op">.</span>ejs
+├── docker<span class="t-op">-</span>compose<span class="t-op">.</span>yml
+├── frontend
+│   ├── angular<span class="t-op">.</span>json
+│   ├── Dockerfile
+│   ├── nginx<span class="t-op">.</span>conf
+│   ├── package<span class="t-op">.</span>json
+│   ├── package<span class="t-op">-</span>lock<span class="t-op">.</span>json
+│   ├── public
+│   │   └── favicon<span class="t-op">.</span>ico
+│   ├── src
+│   │   ├── app
+│   │   │   ├── admin
+│   │   │   │   └── check
+│   │   │   │       ├── check<span class="t-op">.</span>component<span class="t-op">.</span>css
+│   │   │   │       ├── check<span class="t-op">.</span>component<span class="t-op">.</span>html
+│   │   │   │       └── check<span class="t-op">.</span>component<span class="t-op">.</span>ts
+│   │   │   ├── app<span class="t-op">.</span>config<span class="t-op">.</span>ts
+│   │   │   ├── app<span class="t-op">.</span>css
+│   │   │   ├── app<span class="t-op">.</span>html
+│   │   │   ├── app<span class="t-op">.</span>routes<span class="t-op">.</span>ts
+│   │   │   ├── app<span class="t-op">.</span>spec<span class="t-op">.</span>ts
+│   │   │   ├── app<span class="t-op">.</span>ts
+│   │   │   ├── auth<span class="t-op">-</span>redirect
+│   │   │   │   ├── auth<span class="t-op">-</span>redirect<span class="t-op">.</span>component<span class="t-op">.</span>css
+│   │   │   │   ├── auth<span class="t-op">-</span>redirect<span class="t-op">.</span>component<span class="t-op">.</span>html
+│   │   │   │   └── auth<span class="t-op">-</span>redirect<span class="t-op">.</span>component<span class="t-op">.</span>ts
+│   │   │   ├── dashboard
+│   │   │   │   ├── dashboard<span class="t-op">.</span>css
+│   │   │   │   ├── dashboard<span class="t-op">.</span>html
+│   │   │   │   └── dashboard<span class="t-op">.</span>ts
+│   │   │   ├── guards
+│   │   │   │   └── admin<span class="t-op">.</span>guard<span class="t-op">.</span>ts
+│   │   │   ├── interceptors
+│   │   │   │   └── auth<span class="t-op">.</span>interceptor<span class="t-op">.</span>ts
+│   │   │   ├── login
+│   │   │   │   ├── login<span class="t-op">.</span>css
+│   │   │   │   ├── login<span class="t-op">.</span>html
+│   │   │   │   ├── login<span class="t-op">.</span>spec<span class="t-op">.</span>ts
+│   │   │   │   └── login<span class="t-op">.</span>ts
+│   │   │   ├── register
+│   │   │   │   ├── register<span class="t-op">.</span>css
+│   │   │   │   ├── register<span class="t-op">.</span>html
+│   │   │   │   ├── register<span class="t-op">.</span>spec<span class="t-op">.</span>ts
+│   │   │   │   └── register<span class="t-op">.</span>ts
+│   │   │   ├── room<span class="t-op">-</span>entry
+│   │   │   │   ├── room<span class="t-op">-</span>entry<span class="t-op">.</span>css
+│   │   │   │   ├── room<span class="t-op">-</span>entry<span class="t-op">.</span>html
+│   │   │   │   └── room<span class="t-op">-</span>entry<span class="t-op">.</span>ts
+│   │   │   ├── services
+│   │   │   │   ├── admin<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   │   │   ├── auth<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   │   │   ├── http<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   │   │   ├── qrcode<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   │   │   └── room<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   │   ├── toast<span class="t-op">.</span>component<span class="t-op">.</span>css
+│   │   │   ├── toast<span class="t-op">.</span>component<span class="t-op">.</span>ts
+│   │   │   └── toast<span class="t-op">.</span>service<span class="t-op">.</span>ts
+│   │   ├── environments
+│   │   │   ├── environment<span class="t-op">.</span>prod<span class="t-op">.</span>ts
+│   │   │   └── environment<span class="t-op">.</span>ts
+│   │   ├── index<span class="t-op">.</span>html
+│   │   ├── main<span class="t-op">.</span>ts
+│   │   └── styles<span class="t-op">.</span>css
+│   ├── tsconfig<span class="t-op">.</span>app<span class="t-op">.</span>json
+│   ├── tsconfig<span class="t-op">.</span>json
+│   └── tsconfig<span class="t-op">.</span>spec<span class="t-op">.</span>json
+├── package<span class="t-op">.</span>json
+└── package<span class="t-op">-</span>lock<span class="t-op">.</span>json</pre></div><p>First, inspecting the QR code generated for a normal user shows that it contains three main fields in JSON format: userId, roomId, and username.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*R5FsaEp1G3G3v6RuAlbHrw.png"></figure><p>Next, let’s take a closer look at what the admin bot does when it scans the QR code.</p><div class="code-block" data-lang="javascript"><div class="code-bar"><span class="dots"></span><span class="code-lang">javascript</span><button class="code-copy" type="button">copy</button></div><pre>  <span class="t-kw">try</span> <span class="t-op">{</span>
+    <span class="t-kw">if</span> <span class="t-op">(</span><span class="t-kw">typeof</span> browser<span class="t-op">.</span>createIncognitoBrowserContext <span class="t-op">=</span><span class="t-op">=</span><span class="t-op">=</span> <span class="t-st">'function'</span><span class="t-op">)</span> <span class="t-op">{</span>
+      context <span class="t-op">=</span> <span class="t-kw">await</span> browser<span class="t-op">.</span><span class="t-fn">createIncognitoBrowserContext</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span>
+      page <span class="t-op">=</span> <span class="t-kw">await</span> context<span class="t-op">.</span><span class="t-fn">newPage</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span>
+    <span class="t-op">}</span> <span class="t-kw">else</span> <span class="t-op">{</span>
+      page <span class="t-op">=</span> <span class="t-kw">await</span> browser<span class="t-op">.</span><span class="t-fn">newPage</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span>
+      context <span class="t-op">=</span> page<span class="t-op">.</span>browserContext <span class="t-op">?</span> page<span class="t-op">.</span><span class="t-fn">browserContext</span><span class="t-op">(</span><span class="t-op">)</span> <span class="t-op">:</span> <span class="t-kw">null</span><span class="t-op">;</span>
+    <span class="t-op">}</span>
+
+    <span class="t-kw">await</span> page<span class="t-op">.</span><span class="t-fn">setUserAgent</span><span class="t-op">(</span><span class="t-st">'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/115.0.0.0 Safari/537.36'</span><span class="t-op">)</span><span class="t-op">;</span>
+
+    page<span class="t-op">.</span><span class="t-fn">on</span><span class="t-op">(</span><span class="t-st">'console'</span><span class="t-op">,</span> m <span class="t-op">=</span><span class="t-op">&gt;</span> console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">'PAGE LOG&gt;'</span><span class="t-op">,</span> m<span class="t-op">.</span><span class="t-fn">text</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+    page<span class="t-op">.</span><span class="t-fn">on</span><span class="t-op">(</span><span class="t-st">'request'</span><span class="t-op">,</span> r <span class="t-op">=</span><span class="t-op">&gt;</span> console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">'PAGE REQ&gt;'</span><span class="t-op">,</span> r<span class="t-op">.</span><span class="t-fn">method</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">,</span> r<span class="t-op">.</span><span class="t-fn">url</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+    page<span class="t-op">.</span><span class="t-fn">on</span><span class="t-op">(</span><span class="t-st">'response'</span><span class="t-op">,</span> r <span class="t-op">=</span><span class="t-op">&gt;</span> console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">'PAGE RES&gt;'</span><span class="t-op">,</span> r<span class="t-op">.</span><span class="t-fn">status</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">,</span> r<span class="t-op">.</span><span class="t-fn">url</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+
+    <span class="t-kw">const</span> origin <span class="t-op">=</span> FRONTEND_URL<span class="t-op">.</span><span class="t-fn">replace</span><span class="t-op">(</span><span class="t-op">/</span>\<span class="t-op">/</span>\<span class="t-op">/</span><span class="t-op">+</span>$<span class="t-op">/</span><span class="t-op">,</span> <span class="t-st">''</span><span class="t-op">)</span><span class="t-op">;</span>
+    console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">'Bot going to frontend origin:'</span><span class="t-op">,</span> origin<span class="t-op">)</span><span class="t-op">;</span>
+
+    <span class="t-kw">await</span> page<span class="t-op">.</span><span class="t-fn">goto</span><span class="t-op">(</span>origin<span class="t-op">,</span> <span class="t-op">{</span> waitUntil<span class="t-op">:</span> <span class="t-st">'networkidle2'</span><span class="t-op">,</span> timeout<span class="t-op">:</span> <span class="t-nu">30000</span> <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+    
+    <span class="t-kw">await</span> page<span class="t-op">.</span><span class="t-fn">evaluate</span><span class="t-op">(</span><span class="t-op">(</span>t<span class="t-op">,</span> u<span class="t-op">)</span> <span class="t-op">=</span><span class="t-op">&gt;</span> <span class="t-op">{</span> 
+      localStorage<span class="t-op">.</span><span class="t-fn">setItem</span><span class="t-op">(</span><span class="t-st">'pharaonic_token'</span><span class="t-op">,</span> t<span class="t-op">)</span><span class="t-op">;</span> 
+      localStorage<span class="t-op">.</span><span class="t-fn">setItem</span><span class="t-op">(</span><span class="t-st">'pharaonic_user'</span><span class="t-op">,</span> JSON<span class="t-op">.</span><span class="t-fn">stringify</span><span class="t-op">(</span>u<span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span> 
+    <span class="t-op">}</span><span class="t-op">,</span> token<span class="t-op">,</span> user<span class="t-op">)</span><span class="t-op">;</span>
+
+    <span class="t-kw">const</span> target <span class="t-op">=</span> `$<span class="t-op">{</span>origin<span class="t-op">}</span><span class="t-op">/</span>admin<span class="t-op">/</span>check<span class="t-op">?</span>userId<span class="t-op">=</span>$<span class="t-op">{</span>userId<span class="t-op">}</span>`<span class="t-op">;</span>
+    console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">'Bot navigating to:'</span><span class="t-op">,</span> target<span class="t-op">)</span><span class="t-op">;</span>
+
+    <span class="t-kw">try</span> <span class="t-op">{</span>
+      <span class="t-kw">await</span> page<span class="t-op">.</span><span class="t-fn">goto</span><span class="t-op">(</span>target<span class="t-op">,</span> <span class="t-op">{</span> waitUntil<span class="t-op">:</span> <span class="t-st">'networkidle2'</span><span class="t-op">,</span> timeout<span class="t-op">:</span> <span class="t-nu">30000</span> <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+      
+    <span class="t-op">}</span> <span class="t-kw">catch</span> <span class="t-op">(</span>e<span class="t-op">)</span> <span class="t-op">{</span>
+      console<span class="t-op">.</span><span class="t-fn">warn</span><span class="t-op">(</span><span class="t-st">'page.goto failed:'</span><span class="t-op">,</span> e <span class="t-op">&amp;</span><span class="t-op">&amp;</span> e<span class="t-op">.</span>message<span class="t-op">)</span><span class="t-op">;</span>
+    <span class="t-op">}</span>
+
+
+  <span class="t-op">}</span> finally <span class="t-op">{</span>
+    <span class="t-kw">try</span> <span class="t-op">{</span> <span class="t-kw">if</span> <span class="t-op">(</span>page <span class="t-op">&amp;</span><span class="t-op">&amp;</span> <span class="t-op">!</span>page<span class="t-op">.</span>isClosed <span class="t-op">&amp;</span><span class="t-op">&amp;</span> <span class="t-kw">typeof</span> page<span class="t-op">.</span>close <span class="t-op">=</span><span class="t-op">=</span><span class="t-op">=</span> <span class="t-st">'function'</span><span class="t-op">)</span> <span class="t-kw">await</span> page<span class="t-op">.</span><span class="t-fn">close</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span> <span class="t-op">}</span> <span class="t-kw">catch</span> <span class="t-op">(</span>e<span class="t-op">)</span> <span class="t-op">{</span> <span class="t-op">}</span>
+    <span class="t-kw">try</span> <span class="t-op">{</span> <span class="t-kw">if</span> <span class="t-op">(</span>context <span class="t-op">&amp;</span><span class="t-op">&amp;</span> <span class="t-kw">typeof</span> context<span class="t-op">.</span>close <span class="t-op">=</span><span class="t-op">=</span><span class="t-op">=</span> <span class="t-st">'function'</span><span class="t-op">)</span> <span class="t-kw">await</span> context<span class="t-op">.</span><span class="t-fn">close</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span> <span class="t-op">}</span> <span class="t-kw">catch</span> <span class="t-op">(</span>e<span class="t-op">)</span> <span class="t-op">{</span> <span class="t-op">}</span>
+    <span class="t-kw">try</span> <span class="t-op">{</span> <span class="t-kw">if</span> <span class="t-op">(</span>browser <span class="t-op">&amp;</span><span class="t-op">&amp;</span> <span class="t-kw">typeof</span> browser<span class="t-op">.</span>close <span class="t-op">=</span><span class="t-op">=</span><span class="t-op">=</span> <span class="t-st">'function'</span><span class="t-op">)</span> <span class="t-kw">await</span> browser<span class="t-op">.</span><span class="t-fn">close</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span> <span class="t-op">}</span> <span class="t-kw">catch</span> <span class="t-op">(</span>e<span class="t-op">)</span> <span class="t-op">{</span> <span class="t-op">}</span>
+  <span class="t-op">}</span></pre></div><p>The bot’s primary role is to authenticate as an admin, scan the QR code, <strong>blindly</strong> extract the id parameter, and use it directly in the /admin/check?userId= endpoint. With that in mind, we can move on to reviewing the admin functions.</p><div class="code-block" data-lang="javascript"><div class="code-bar"><span class="dots"></span><span class="code-lang">javascript</span><button class="code-copy" type="button">copy</button></div><pre><span class="t-kw">const</span> express <span class="t-op">=</span> <span class="t-fn">require</span><span class="t-op">(</span><span class="t-st">'express'</span><span class="t-op">)</span><span class="t-op">;</span>
+<span class="t-kw">const</span> router <span class="t-op">=</span> express<span class="t-op">.</span><span class="t-fn">Router</span><span class="t-op">(</span><span class="t-op">)</span><span class="t-op">;</span>
+<span class="t-kw">const</span> adminController <span class="t-op">=</span> <span class="t-fn">require</span><span class="t-op">(</span><span class="t-st">'../controllers/admin.controller'</span><span class="t-op">)</span><span class="t-op">;</span>
+<span class="t-kw">const</span> wrapAsync <span class="t-op">=</span> <span class="t-fn">require</span><span class="t-op">(</span><span class="t-st">'../utils/wrapAsync'</span><span class="t-op">)</span><span class="t-op">;</span>
+
+router<span class="t-op">.</span><span class="t-fn">get</span><span class="t-op">(</span><span class="t-st">'/users/:id'</span><span class="t-op">,</span> <span class="t-fn">wrapAsync</span><span class="t-op">(</span>adminController<span class="t-op">.</span>getUserById<span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+
+router<span class="t-op">.</span><span class="t-fn">get</span><span class="t-op">(</span><span class="t-st">'/promote/:id'</span><span class="t-op">,</span> <span class="t-fn">wrapAsync</span><span class="t-op">(</span>adminController<span class="t-op">.</span>promoteToAdmin<span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+
+router<span class="t-op">.</span><span class="t-fn">post</span><span class="t-op">(</span><span class="t-st">'/rooms'</span><span class="t-op">,</span> <span class="t-fn">wrapAsync</span><span class="t-op">(</span>adminController<span class="t-op">.</span>createRoom<span class="t-op">)</span><span class="t-op">)</span><span class="t-op">;</span>
+
+module<span class="t-op">.</span>exports <span class="t-op">=</span> router<span class="t-op">;</span></pre></div><div class="code-block" data-lang="text"><div class="code-bar"><span class="dots"></span><span class="code-lang">text</span><button class="code-copy" type="button">copy</button></div><pre>promoteUserToAdmin<span class="t-op">:</span> <span class="t-op">(</span>userId<span class="t-op">,</span> callback<span class="t-op">)</span> <span class="t-op">=</span><span class="t-op">&gt;</span> <span class="t-op">{</span>
+    db<span class="t-op">.</span><span class="t-fn">run</span><span class="t-op">(</span>
+      <span class="t-st">'UPDATE users SET is_admin = 1 WHERE id = ?'</span><span class="t-op">,</span>
+      <span class="t-op">[</span>userId<span class="t-op">]</span><span class="t-op">,</span>
+      callback
+    <span class="t-op">)</span><span class="t-op">;</span>
+  <span class="t-op">}</span></pre></div><div class="code-block" data-lang="javascript"><div class="code-bar"><span class="dots"></span><span class="code-lang">javascript</span><button class="code-copy" type="button">copy</button></div><pre><span class="t-kw">async</span> <span class="t-fn">promoteToAdmin</span><span class="t-op">(</span>req<span class="t-op">,</span> res<span class="t-op">,</span> next<span class="t-op">)</span> <span class="t-op">{</span>
+    <span class="t-kw">try</span> <span class="t-op">{</span>
+      <span class="t-kw">if</span> <span class="t-op">(</span><span class="t-op">!</span>req<span class="t-op">.</span>user <span class="t-op">|</span><span class="t-op">|</span> <span class="t-op">!</span>req<span class="t-op">.</span>user<span class="t-op">.</span>is_admin<span class="t-op">)</span> <span class="t-kw">return</span> res<span class="t-op">.</span><span class="t-fn">status</span><span class="t-op">(</span><span class="t-nu">403</span><span class="t-op">)</span><span class="t-op">.</span><span class="t-fn">json</span><span class="t-op">(</span><span class="t-op">{</span> error<span class="t-op">:</span> <span class="t-st">'Admin access required'</span> <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+      <span class="t-kw">const</span> userId <span class="t-op">=</span> req<span class="t-op">.</span>params<span class="t-op">?</span><span class="t-op">.</span>id<span class="t-op">;</span>
+      console<span class="t-op">.</span><span class="t-fn">log</span><span class="t-op">(</span><span class="t-st">"[+] Promote to admin userId:"</span><span class="t-op">,</span> userId<span class="t-op">)</span><span class="t-op">;</span>
+      <span class="t-kw">if</span> <span class="t-op">(</span><span class="t-op">!</span>userId<span class="t-op">)</span> <span class="t-kw">return</span> res<span class="t-op">.</span><span class="t-fn">status</span><span class="t-op">(</span><span class="t-nu">400</span><span class="t-op">)</span><span class="t-op">.</span><span class="t-fn">json</span><span class="t-op">(</span><span class="t-op">{</span> error<span class="t-op">:</span> <span class="t-st">'User ID is required'</span> <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+      dbHelper<span class="t-op">.</span><span class="t-fn">promoteUserToAdmin</span><span class="t-op">(</span>userId<span class="t-op">,</span> <span class="t-op">(</span>err<span class="t-op">)</span> <span class="t-op">=</span><span class="t-op">&gt;</span> <span class="t-op">{</span>
+        <span class="t-kw">if</span> <span class="t-op">(</span>err<span class="t-op">)</span> <span class="t-kw">return</span> <span class="t-fn">next</span><span class="t-op">(</span>err<span class="t-op">)</span><span class="t-op">;</span>
+        res<span class="t-op">.</span><span class="t-fn">json</span><span class="t-op">(</span><span class="t-op">{</span> message<span class="t-op">:</span> <span class="t-st">'User promoted to admin successfully'</span> <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+      <span class="t-op">}</span><span class="t-op">)</span><span class="t-op">;</span>
+    <span class="t-op">}</span> <span class="t-kw">catch</span> <span class="t-op">(</span>err<span class="t-op">)</span> <span class="t-op">{</span>
+      <span class="t-fn">next</span><span class="t-op">(</span>err<span class="t-op">)</span><span class="t-op">;</span>
+    <span class="t-op">}</span>
+  <span class="t-op">}</span></pre></div><p>The admin routes expose three functions, with the most interesting one being /api/admin/promote/:id, which upgrades a normal user to an admin role.</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*PasltxVYZFQBH8r3.gif"></figure><p>At this point, if the admin bot calls /admin/check?userId= with a value like ../../../api/admin/promote/123 the endpoint /api/admin/promote/../../../api/admin/promote/123 will be called and then the backend resolves it to api/admin/promote/123. As a result, this should promote the user to admin—so let’s test it.</p><p>The next step is to take a valid QR scan JSON from a normal user, modify the id field to ../../../api/admin/promote/31, and then submit it back to the bot for scanning to see if it promotes the user to the admin role.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*4JXBwh0iNa_KYEo97qpCpQ.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/966/1*qg5q_esTx7R_qJyDCs4grA.png"></figure><p>Now let’s take a look at the main page.</p><figure><img src="https://cdn-images-1.medium.com/max/612/1*dw80KN6QuqhF3CEVnEduUQ.png"></figure><figure><img src="https://cdn-images-1.medium.com/max/386/0*aYa31B9Sh7d6g-OA.gif"></figure><p>Yahooooooooo <a href="https://www.linkedin.com/in/0xsponge/" target="_blank" rel="noopener noreferrer">0xSponge</a> is admin let’s get the flag</p><figure><img src="https://cdn-images-1.medium.com/max/675/1*_ZuTZj8QCPAZ8nrOALnYwg.png"></figure><p>In the end, this challenge highlights how blindly trusting user-controlled input — especially when it’s later reused in privileged backend logic — can completely break role separation. A simple path traversal combined with an over-trusted admin bot was enough to escalate privileges and access restricted resources. Proper input validation and strict routing controls would have prevented this entire exploit chain.</p><figure><img src="https://cdn-images-1.medium.com/max/480/0*8_KUHrAxzZ2LK2m8.gif"></figure>
             </div>
 
             <p class="post-origin">
