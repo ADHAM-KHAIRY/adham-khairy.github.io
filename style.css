@@ -1,6 +1,6 @@
 /* ============================================================
    0xSponge — Bikini Bottom photo background + dark glass
-   drop your image at  assets/bikini-bottom.jpg
+   background photo lives at repo root: bikini-bottom.jpg
    ============================================================ */
 
 :root {
@@ -456,7 +456,9 @@ a.cert:hover .ic { background: rgba(255, 210, 63, 0.2); }
 .contact-card:hover { border-color: var(--border-2); transform: translateY(-3px); }
 .contact-card .ic { font-size: 1.7rem; margin-bottom: 10px; }
 .contact-card h3 { font-size: 1.02rem; margin-bottom: 7px; }
-.contact-card a { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); text-decoration: none; word-break: break-word; }
+.contact-card a,
+.contact-card .handle { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); text-decoration: none; word-break: break-word; }
+.contact-card .handle { display: inline-block; cursor: text; -webkit-user-select: all; user-select: all; }
 .contact-card a:hover { text-decoration: underline; }
 .contact-card .note { color: var(--faint); font-size: 0.78rem; margin-top: 7px; }
 
@@ -506,6 +508,9 @@ a.cert:hover .ic { background: rgba(255, 210, 63, 0.2); }
    RESPONSIVE
    ============================================================ */
 @media (max-width: 720px) {
+    /* fixed attachment janks on iOS/Android; let it scroll instead */
+    body { background-attachment: scroll, scroll, scroll; }
+
     .stats { grid-template-columns: repeat(2, 1fr); }
     .site-header { padding: 12px 16px; }
     .tl-top { flex-direction: column; }
